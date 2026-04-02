@@ -1,6 +1,6 @@
 // Disney character pool — fetches from disneyapi.dev, caches in sessionStorage
 const DISNEY = (() => {
-  const SESSION_KEY = 'logoquiz_disney_pool'
+  const SESSION_KEY = 'logoquiz_disney_pool_v3'  // bump to bust cached unfiltered pools
 
   async function loadPool(onProgress) {
     // Return cached pool if available this session
@@ -29,28 +29,47 @@ const DISNEY = (() => {
 
     const all = results.flat()
 
-    // Non-animated franchise keywords — exclude Marvel, Star Wars, live-action
+    // Live-action / non-animated franchise markers.
+    // Checked against a character's films + tvShows titles only (not videoGames,
+    // which often cross franchises and cause false positives).
     const LIVE_ACTION = [
+      // Marvel Cinematic Universe films
       'avengers', 'iron man', 'thor', 'captain america', 'black widow',
       'black panther', 'spider-man', 'spider man', 'doctor strange',
       'ant-man', 'ant man', 'guardians of the galaxy', 'eternals',
-      'shang-chi', 'hawkeye', 'wandavision', 'moon knight', 'the falcon',
+      'shang-chi', 'deadpool', 'wolverine', 'x-men', 'fantastic four',
+      // Marvel Disney+ series
+      'hawkeye', 'wandavision', 'moon knight', 'the falcon',
       'winter soldier', 'she-hulk', 'ms. marvel', 'secret invasion',
-      'star wars', 'the mandalorian', 'andor', 'obi-wan', 'clone wars',
-      'book of boba', 'rogue one', 'the bad batch', 'ahsoka',
+      'loki', 'echo', 'agatha all along', 'ironheart',
+      // Marvel legacy TV
+      'agents of s.h.i.e.l.d', 'agent carter', 'daredevil', 'jessica jones',
+      'luke cage', 'iron fist', 'the punisher', 'runaways', 'cloak',
+      // Star Wars — films
+      'star wars', 'rogue one', 'solo: a star wars',
+      // Star Wars — Disney+ series
+      'the mandalorian', 'andor', 'obi-wan kenobi', 'book of boba fett',
+      'the bad batch', 'ahsoka', 'skeleton crew', 'acolyte',
+      // Star Wars — animated (keep Clone Wars animated but block live-action Star Wars universe)
+      // Note: we keep 'star wars rebels' and 'star wars: the clone wars' animated shows
+      // only by excluding the broader 'star wars' franchise-level entries that hit live-action chars
+      // Pirates / adventure live-action
       'pirates of the caribbean',
       'national treasure',
-      'tron: legacy', 'tron: uprising',
       'indiana jones',
+      // Other live-action franchises
+      'tron: legacy',
+      'cruella',
+      'maleficent',        // live-action remake; animated Maleficent has "Sleeping Beauty" as primary film
     ]
 
     function isAnimated(c) {
-      const titles = [
-        ...(c.films || []),
-        ...(c.tvShows || []),
-        ...(c.videoGames || []),
-        ...(c.shortFilms || []),
-      ].join(' ').toLowerCase()
+      // Must have at least one film OR tvShow credit — filters out video-game-only / obscure chars
+      const films   = c.films   || []
+      const shows   = c.tvShows || []
+      if (films.length === 0 && shows.length === 0) return false
+
+      const titles = [...films, ...shows].join(' ').toLowerCase()
       return !LIVE_ACTION.some(kw => titles.includes(kw))
     }
 
@@ -59,7 +78,7 @@ const DISNEY = (() => {
     const filtered = all.filter(c =>
       c.imageUrl &&
       c.name &&
-      c.name.length <= 36 &&
+      c.name.length <= 30 &&          // tighter — cuts obscure minor characters
       !c.imageUrl.includes('Question_mark') &&
       !c.imageUrl.includes('question_mark') &&
       !c.imageUrl.includes('No_image') &&
