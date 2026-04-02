@@ -379,7 +379,7 @@
     const secsLeft = CONFIG.timePerQuestion - secsUsed
     const q        = state.questions[state.current]
     const correct  = idx === q.correctIndex
-    const points   = correct ? Math.max(1, Math.ceil(secsLeft)) : 0
+    const points   = correct ? Math.max(0, Math.floor(secsLeft)) : 0
 
     if (correct) { AUDIO.correct(); state.score += points }
     else         { AUDIO.wrong() }
@@ -563,11 +563,29 @@
   $('btn-history').addEventListener('click', renderHistory)
   $('btn-play-again').addEventListener('click', () => startGame(state.pack))
   $('btn-switch-pack').addEventListener('click', () => { showScreen('start'); updateBestScore() })
+  $('btn-home').addEventListener('click', () => { showScreen('start'); updateBestScore() })
   $('btn-results-history').addEventListener('click', renderHistory)
   $('btn-history-back').addEventListener('click', () => {
     if (state.answers.length === CONFIG.questionsPerGame) { renderResults(); showScreen('results') }
     else { showScreen('start'); updateBestScore() }
   })
+
+  // Volume control
+  const volSlider = $('volume-slider')
+  const volBtn    = $('btn-volume')
+  const volPanel  = $('volume-panel')
+
+  if (volSlider) {
+    volSlider.value = AUDIO.getVolume()
+    volSlider.addEventListener('input', () => AUDIO.setVolume(parseFloat(volSlider.value)))
+  }
+  if (volBtn) {
+    volBtn.addEventListener('click', e => {
+      e.stopPropagation()
+      volPanel.classList.toggle('hidden')
+    })
+  }
+  document.addEventListener('click', () => { if (volPanel) volPanel.classList.add('hidden') })
 
   document.addEventListener('keydown', e => {
     if (state.screen !== 'game' || !state.answering) return

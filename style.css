@@ -254,11 +254,100 @@ body {
   100% { opacity: 0; transform: translateX(-50%) translateY(-36px) scale(0.9); }
 }
 
-.voice-indicator {
-  font-size: 1.1rem;
-  animation: pulse 1.2s ease-in-out infinite;
+/* Mic meter */
+.hud-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
-.voice-indicator.hidden { visibility: hidden; }
+
+.mic-meter {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.85rem;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+}
+.mic-meter.active {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.meter-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 16px;
+}
+
+.bar {
+  width: 3px;
+  background: var(--success);
+  border-radius: 2px;
+  height: 4px;
+  transform-origin: bottom;
+}
+.mic-meter.active .bar { animation: barBounce 0.7s ease-in-out infinite; }
+.mic-meter.active .bar:nth-child(1) { animation-duration: 0.65s; animation-delay: 0.00s; }
+.mic-meter.active .bar:nth-child(2) { animation-duration: 0.80s; animation-delay: 0.10s; }
+.mic-meter.active .bar:nth-child(3) { animation-duration: 0.55s; animation-delay: 0.20s; }
+.mic-meter.active .bar:nth-child(4) { animation-duration: 0.90s; animation-delay: 0.05s; }
+
+@keyframes barBounce {
+  0%, 100% { height: 3px;  opacity: 0.45; }
+  50%       { height: 14px; opacity: 1;   }
+}
+
+/* Volume control */
+.vol-wrap {
+  position: relative;
+}
+
+.vol-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  padding: 4px 6px;
+  border-radius: 8px;
+  transition: background 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+.vol-btn:hover { background: rgba(255,255,255,0.08); }
+
+.volume-panel {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  background: var(--surface);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 150px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+  z-index: 100;
+}
+
+.vol-label {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+#volume-slider {
+  width: 100%;
+  accent-color: var(--primary);
+  cursor: pointer;
+}
+
+.voice-indicator { display: none; }
 
 @keyframes pulse {
   0%, 100% { opacity: 1; transform: scale(1); }

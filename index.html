@@ -65,11 +65,35 @@
     <!-- HUD -->
     <div class="hud">
       <span class="q-counter" id="q-counter">Q 1 / 10</span>
+
       <div class="hud-score">
         <div class="score-value" id="score-display">0</div>
         <div class="score-label">pts</div>
       </div>
-      <span id="voice-indicator" class="voice-indicator hidden">🎤</span>
+
+      <!-- Mic meter + volume control (right side) -->
+      <div class="hud-right">
+        <!-- Animated mic meter — visible when listening -->
+        <div id="mic-meter" class="mic-meter">
+          <span>🎤</span>
+          <div class="meter-bars">
+            <div class="bar"></div>
+            <div class="bar"></div>
+            <div class="bar"></div>
+            <div class="bar"></div>
+          </div>
+        </div>
+        <span id="voice-indicator" class="hidden"></span>
+
+        <!-- Volume control -->
+        <div class="vol-wrap">
+          <button id="btn-volume" class="vol-btn" title="Volume">🔊</button>
+          <div id="volume-panel" class="volume-panel hidden">
+            <span class="vol-label">Volume</span>
+            <input type="range" id="volume-slider" min="0" max="1" step="0.05" value="0.7" />
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- Shuffle stage -->
@@ -110,6 +134,7 @@
       <div class="results-actions">
         <button class="btn btn-primary" id="btn-play-again">▶ Play Again</button>
         <button class="btn btn-ghost btn-sm" id="btn-switch-pack">Change Pack</button>
+        <button class="btn btn-ghost btn-sm" id="btn-home">🏠 Home</button>
         <button class="btn btn-ghost btn-sm" id="btn-results-history">History</button>
       </div>
     </div>

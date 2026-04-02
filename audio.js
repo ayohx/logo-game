@@ -1,72 +1,146 @@
-// Web Audio API — zero file dependencies
+// ── Audio Engine — warm, musical feedback ────────────────────────────────────
 const AUDIO = (() => {
-  let ctx = null
+  let ctx        = null
+  let masterGain = null
 
   function getCtx() {
-    if (!ctx) ctx = new (window.AudioContext || window.webkitAudioContext)()
+    if (!ctx) {
+      ctx        = new (window.AudioContext || window.webkitAudioContext)()
+      masterGain = ctx.createGain()
+      masterGain.gain.value = parseFloat(localStorage.getItem('logoquiz_vol') ?? '0.7')
+      masterGain.connect(ctx.destination)
+    }
     return ctx
   }
 
-  function tone(freq, type, startTime, duration, gainVal = 0.3, ramp = true) {
-    const c = getCtx()
-    const osc  = c.createOscillator()
-    const gain = c.createGain()
-    osc.connect(gain)
-    gain.connect(c.destination)
+  // Utility: schedule a sine tone through masterGain
+  function sine(freq, startTime, duration, peakGain, detuneHz = 0) {
+    const c   = getCtx()
+    const osc = c.createOscillator()
+    const g   = c.createGain()
+    osc.connect(g)
+    g.connect(masterGain)
 
-    osc.type      = type
-    osc.frequency.setValueAtTime(freq, startTime)
+    osc.type = 'sine'
+    osc.frequency.setValueAtTime(freq + detuneHz, startTime)
 
-    gain.gain.setValueAtTime(gainVal, startTime)
-    if (ramp) gain.gain.exponentialRampToValueAtTime(0.001, startTime + duration)
+    // Smooth ADSR: quick attack, natural exponential decay
+    g.gain.setValueAtTime(0, startTime)
+    g.gain.linearRampToValueAtTime(peakGain, startTime + 0.018)
+    g.gain.exponentialRampToValueAtTime(0.001, startTime + duration)
 
     osc.start(startTime)
     osc.stop(startTime + duration + 0.02)
   }
 
+  // Warm noise burst (for texture on wrong answer)
+  function noiseBurst(startTime, duration, gain) {
+    const c      = getCtx()
+    const size   = c.sampleRate * duration
+    const buffer = c.createBuffer(1, size, c.sampleRate)
+    const data   = buffer.getChannelData(0)
+    for (let i = 0; i < size; i++) data[i] = (Math.random() * 2 - 1) * 0.3
+
+    const src    = c.createBufferSource()
+    src.buffer   = buffer
+
+    const bpf    = c.createBiquadFilter()
+    bpf.type     = 'bandpass'
+    bpf.frequency.value = 180
+    bpf.Q.value  = 0.8
+
+    const g      = c.createGain()
+    src.connect(bpf)
+    bpf.connect(g)
+    g.connect(masterGain)
+
+    g.gain.setValueAtTime(gain, startTime)
+    g.gain.exponentialRampToValueAtTime(0.001, startTime + duration)
+    src.start(startTime)
+    src.stop(startTime + duration + 0.01)
+  }
+
   return {
-    // Rising chime for correct
+    // ── Correct: warm C-major arpeggio ──────────────────────────────────────
     correct() {
       const c = getCtx()
       const t = c.currentTime
-      tone(523, 'sine', t,        0.12, 0.25)
-      tone(659, 'sine', t + 0.10, 0.12, 0.25)
-      tone(784, 'sine', t + 0.20, 0.20, 0.30)
+
+      // C5 E5 G5 — slightly detuned for warmth
+      sine(523.25, t + 0.00, 0.55, 0.22,  0)
+      sine(659.25, t + 0.08, 0.50, 0.20,  1.5)
+      sine(783.99, t + 0.16, 0.55, 0.24, -1)
+      // Octave sparkle
+      sine(1046.5, t + 0.22, 0.35, 0.12,  0)
     },
 
-    // Descending buzz for wrong / timeout
+    // ── Wrong: soft descending thud ─────────────────────────────────────────
     wrong() {
       const c = getCtx()
       const t = c.currentTime
-      tone(300, 'sawtooth', t,        0.15, 0.20)
-      tone(220, 'sawtooth', t + 0.12, 0.15, 0.20)
-      tone(160, 'sawtooth', t + 0.24, 0.20, 0.15)
+
+      // Low sine sweep down
+      const osc = c.createOscillator()
+      const g   = c.createGain()
+      osc.connect(g)
+      g.connect(masterGain)
+      osc.type = 'sine'
+      osc.frequency.setValueAtTime(220, t)
+      osc.frequency.exponentialRampToValueAtTime(70, t + 0.28)
+      g.gain.setValueAtTime(0, t)
+      g.gain.linearRampToValueAtTime(0.30, t + 0.012)
+      g.gain.exponentialRampToValueAtTime(0.001, t + 0.32)
+      osc.start(t)
+      osc.stop(t + 0.35)
+
+      // Subtle low noise texture
+      noiseBurst(t, 0.20, 0.08)
     },
 
-    // Soft tick each second (urgent = louder + higher pitch)
+    // ── Tick: soft woodblock click ───────────────────────────────────────────
     tick(urgent = false) {
-      const c   = getCtx()
-      const t   = c.currentTime
-      const freq = urgent ? 880 : 440
-      tone(freq, 'square', t, 0.04, urgent ? 0.12 : 0.06, true)
+      const c = getCtx()
+      const t = c.currentTime
+      // Two very short sines — fundamental + 3rd harmonic = woody click
+      sine(urgent ? 900  : 600,  t, urgent ? 0.055 : 0.040, urgent ? 0.14 : 0.07)
+      sine(urgent ? 2700 : 1800, t, urgent ? 0.030 : 0.022, urgent ? 0.06 : 0.03)
     },
 
-    // End-of-game fanfare (score-scaled — higher score = more triumphant)
+    // ── End fanfare: score-scaled melody ────────────────────────────────────
     end(score) {
       const c = getCtx()
       const t = c.currentTime
+
       if (score >= 35) {
-        // Happy ascending fanfare
-        const notes = [523, 659, 784, 1047]
-        notes.forEach((f, i) => tone(f, 'sine', t + i * 0.12, 0.25, 0.28))
+        // Triumphant: C E G C (ascending, then chord)
+        const melody = [523.25, 659.25, 783.99, 1046.5]
+        melody.forEach((f, i) => sine(f, t + i * 0.11, 0.38, 0.22))
+        // Final chord swell
+        ;[523.25, 659.25, 783.99].forEach(f => sine(f, t + 0.44, 0.65, 0.18, 0))
+      } else if (score >= 20) {
+        // Neutral: C E G
+        sine(523.25, t + 0.00, 0.35, 0.20)
+        sine(659.25, t + 0.10, 0.35, 0.20)
+        sine(783.99, t + 0.20, 0.45, 0.22)
       } else {
-        // Neutral two-tone
-        tone(440, 'sine', t,        0.20, 0.22)
-        tone(523, 'sine', t + 0.18, 0.22, 0.22)
+        // Low result: descending C A F
+        sine(523.25, t + 0.00, 0.35, 0.18)
+        sine(440.00, t + 0.12, 0.35, 0.16)
+        sine(349.23, t + 0.24, 0.45, 0.18)
       }
     },
 
-    // Resume context after user gesture (browsers require this)
+    // ── Volume control ───────────────────────────────────────────────────────
+    setVolume(v) {
+      const vol = Math.max(0, Math.min(1, v))
+      if (masterGain) masterGain.gain.value = vol
+      localStorage.setItem('logoquiz_vol', String(vol))
+    },
+
+    getVolume() {
+      return masterGain ? masterGain.gain.value : parseFloat(localStorage.getItem('logoquiz_vol') ?? '0.7')
+    },
+
     resume() {
       if (ctx && ctx.state === 'suspended') ctx.resume()
     },
