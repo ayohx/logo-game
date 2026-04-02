@@ -901,10 +901,25 @@ details[open] .hs-arrow { transform: rotate(90deg); }
 
 /* Characters can be portrait images — allow taller prompt area */
 .prompt-logo.disney-char {
-  width: min(110px, 28vw);
-  height: min(140px, 36vw);
+  width: min(140px, 34vw);
+  height: min(175px, 44vw);
   object-fit: contain;
-  padding: 8px;
+  padding: 4px;
+}
+
+/* Disney option cards — taller portrait containers */
+.options-logo.disney .option-card {
+  min-width: 108px;
+}
+.options-logo.disney .opt-logo-wrap {
+  width: 88px;
+  height: 110px;
+  border-radius: 10px;
+}
+.options-logo.disney .opt-logo {
+  width: 84px;
+  height: 106px;
+  object-fit: cover;
 }
 
 /* Film mode shows char name under the image */

@@ -169,12 +169,12 @@
       if (showsImage) {
         slotImg.classList.remove('hidden')
         const targetSrc = q.pack === 'disney'
-          ? q.correct.imageUrl
+          ? DISNEY.imgUrl(q.correct.imageUrl, 400)
           : logoUrl(q.correct.domain, CONFIG.logoSize)
 
         // Build a pool of random images for cycling
         const cyclePool = q.pack === 'disney'
-          ? shuffle([...state.disneyPool]).slice(0, 20).map(c => c.imageUrl)
+          ? shuffle([...state.disneyPool]).slice(0, 20).map(c => DISNEY.imgUrl(c.imageUrl, 200))
           : shuffle([...LOGO_POOL]).slice(0, 20).map(c => logoUrl(c.domain, CONFIG.logoSize))
 
         let count = 0
@@ -247,10 +247,10 @@
 
     if (['logo-to-name', 'image-to-name', 'image-to-film'].includes(q.mode)) {
       const img     = document.createElement('img')
-      img.className = 'prompt-logo'
+      img.className = q.pack === 'disney' ? 'prompt-logo disney-char' : 'prompt-logo'
       img.alt       = q.pack === 'disney' ? q.correct.name : 'Brand logo'
       img.src       = q.pack === 'disney'
-        ? q.correct.imageUrl
+        ? DISNEY.imgUrl(q.correct.imageUrl, 400)
         : logoUrl(q.correct.domain, CONFIG.logoSize)
       prompt.appendChild(img)
 
@@ -275,7 +275,8 @@
 
     // Determine if options should be shown as images or text
     const optAsImage = q.mode === 'name-to-logo' || q.mode === 'name-to-image'
-    container.className = `options ${optAsImage ? 'options-logo' : 'options-text'}`
+    const disneyClass = q.pack === 'disney' ? ' disney' : ''
+    container.className = `options ${optAsImage ? 'options-logo' + disneyClass : 'options-text'}`
 
     q.options.forEach((opt, i) => {
       const card     = document.createElement('button')
@@ -285,15 +286,16 @@
       if (optAsImage) {
         // Image option card
         const imgSrc = q.pack === 'disney'
-          ? opt.imageUrl
+          ? DISNEY.imgUrl(opt.imageUrl, 280)
           : logoUrl(opt.domain, CONFIG.optLogoSize)
         const altTxt = q.pack === 'disney' ? opt.name : opt.name
+        const showHint = !(q.pack === 'disney' && q.mode === 'name-to-image')
         card.innerHTML = `
           <span class="opt-key">${labels[i]}</span>
           <div class="opt-logo-wrap">
             <img src="${imgSrc}" alt="${altTxt}" class="opt-logo" />
           </div>
-          <span class="opt-name-hint">${altTxt}</span>
+          ${showHint ? `<span class="opt-name-hint">${altTxt}</span>` : ''}
         `
       } else {
         // Text option card
@@ -462,7 +464,7 @@
     $('breakdown').innerHTML = state.answers.map((a, i) => {
       const label = a.pack === 'disney' ? a.char.name : a.logo.name
       const imgSrc = a.pack === 'disney'
-        ? a.char.imageUrl
+        ? DISNEY.imgUrl(a.char.imageUrl, 56)
         : logoUrl(a.logo.domain, 28)
       const modeLbl = { 'logo-to-name':'🏷️','name-to-logo':'🖼️','image-to-name':'🎭','name-to-image':'🖼️','image-to-film':'🎬' }[a.mode] || ''
       const detail  = a.mode === 'image-to-film' ? ` → ${a.film}` : ''

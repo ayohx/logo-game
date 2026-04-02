@@ -44,10 +44,24 @@ const DISNEY = (() => {
     return filtered
   }
 
+  // Wikia CDN supports scale-to-width-down via the URL path.
+  // Transforms any Wikia image URL to request a specific width.
+  function imgUrl(url, width = 320) {
+    if (!url || !url.includes('wikia.nocookie.net')) return url
+    // Remove any existing scale param first (avoid doubling)
+    url = url.replace(/\/scale-to-width-down\/\d+/, '')
+    if (url.includes('/revision/latest')) {
+      return url.replace('/revision/latest', `/revision/latest/scale-to-width-down/${width}`)
+    }
+    // No revision segment — append one
+    const [base, query] = url.split('?')
+    return `${base}/revision/latest/scale-to-width-down/${width}${query ? '?' + query : ''}`
+  }
+
   // Collect all unique film names from a pool of characters
   function allFilms(pool) {
     return [...new Set(pool.flatMap(c => c.films || []).filter(Boolean))]
   }
 
-  return { loadPool, allFilms }
+  return { loadPool, allFilms, imgUrl }
 })()
