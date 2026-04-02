@@ -1,5 +1,5 @@
-// Curated brand pool — confirmed on logo.dev
-const LOGO_POOL = [
+// ── Curated brand pool — confirmed on logo.dev ───────────────────────────────
+export const LOGO_POOL = [
 
   // ── Tech ──────────────────────────────────────────────────────────────────
   { domain: 'apple.com',        name: 'Apple',           cat: 'Tech'         },
@@ -89,15 +89,6 @@ const LOGO_POOL = [
   { domain: 'gap.com',          name: 'Gap',             cat: 'Fashion'      },
   { domain: 'underarmour.com',  name: 'Under Armour',    cat: 'Fashion'      },
 
-  // ── US Supermarkets ───────────────────────────────────────────────────────
-  { domain: 'walmart.com',      name: 'Walmart',         cat: 'Supermarket'  },
-  { domain: 'target.com',       name: 'Target',          cat: 'Supermarket'  },
-  { domain: 'costco.com',       name: 'Costco',          cat: 'Supermarket'  },
-  { domain: 'kroger.com',       name: 'Kroger',          cat: 'Supermarket'  },
-  { domain: 'wholefoodsmarket.com', name: 'Whole Foods', cat: 'Supermarket'  },
-  { domain: 'traderjoes.com',   name: "Trader Joe's",    cat: 'Supermarket'  },
-  { domain: 'instacart.com',    name: 'Instacart',       cat: 'Supermarket'  },
-
   // ── UK / EU Supermarkets ──────────────────────────────────────────────────
   { domain: 'tesco.com',        name: 'Tesco',           cat: 'Supermarket'  },
   { domain: 'sainsburys.co.uk', name: "Sainsbury's",     cat: 'Supermarket'  },
@@ -107,7 +98,9 @@ const LOGO_POOL = [
   { domain: 'lidl.com',         name: 'Lidl',            cat: 'Supermarket'  },
   { domain: 'aldi.com',         name: 'Aldi',            cat: 'Supermarket'  },
   { domain: 'carrefour.com',    name: 'Carrefour',       cat: 'Supermarket'  },
-  { domain: 'edeka.de',         name: 'Edeka',           cat: 'Supermarket'  },
+  { domain: 'walmart.com',      name: 'Walmart',         cat: 'Supermarket'  },
+  { domain: 'target.com',       name: 'Target',          cat: 'Supermarket'  },
+  { domain: 'costco.com',       name: 'Costco',          cat: 'Supermarket'  },
 
   // ── Food & Drink ──────────────────────────────────────────────────────────
   { domain: 'mcdonalds.com',    name: "McDonald's",      cat: 'Food'         },

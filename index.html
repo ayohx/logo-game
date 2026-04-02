@@ -32,7 +32,7 @@
         <button class="pack-card pack-disney" id="btn-disney">
           <span class="pack-icon">🏰</span>
           <span class="pack-name">Disney</span>
-          <span class="pack-desc">Name the characters &amp; their films</span>
+          <span class="pack-desc">Name the iconic cartoon characters</span>
         </button>
       </div>
 
@@ -152,11 +152,7 @@
   </div>
 
 </div>
-<script src="config.js"></script>
-<script src="logos.js"></script>
-<script src="disney.js"></script>
-<script src="audio.js"></script>
-<script src="speech.js"></script>
-<script src="game.js"></script>
+<!-- Single ES-module entry point — no globals, no load-order dependencies -->
+<script type="module" src="src/main.js"></script>
 </body>
 </html>
