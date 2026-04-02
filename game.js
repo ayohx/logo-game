@@ -289,13 +289,11 @@
           ? DISNEY.imgUrl(opt.imageUrl, 280)
           : logoUrl(opt.domain, CONFIG.optLogoSize)
         const altTxt = q.pack === 'disney' ? opt.name : opt.name
-        const showHint = !optAsImage
         card.innerHTML = `
-          <span class="opt-key">${labels[i]}</span>
           <div class="opt-logo-wrap">
             <img src="${imgSrc}" alt="${altTxt}" class="opt-logo" />
           </div>
-          ${showHint ? `<span class="opt-name-hint">${altTxt}</span>` : ''}
+          <span class="opt-key">${labels[i]}</span>
         `
       } else {
         // Text option card

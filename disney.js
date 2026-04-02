@@ -29,7 +29,33 @@ const DISNEY = (() => {
 
     const all = results.flat()
 
-    // Keep characters that have a usable image and a short recognisable name
+    // Non-animated franchise keywords — exclude Marvel, Star Wars, live-action
+    const LIVE_ACTION = [
+      'avengers', 'iron man', 'thor', 'captain america', 'black widow',
+      'black panther', 'spider-man', 'spider man', 'doctor strange',
+      'ant-man', 'ant man', 'guardians of the galaxy', 'eternals',
+      'shang-chi', 'hawkeye', 'wandavision', 'moon knight', 'the falcon',
+      'winter soldier', 'she-hulk', 'ms. marvel', 'secret invasion',
+      'star wars', 'the mandalorian', 'andor', 'obi-wan', 'clone wars',
+      'book of boba', 'rogue one', 'the bad batch', 'ahsoka',
+      'pirates of the caribbean',
+      'national treasure',
+      'tron: legacy', 'tron: uprising',
+      'indiana jones',
+    ]
+
+    function isAnimated(c) {
+      const titles = [
+        ...(c.films || []),
+        ...(c.tvShows || []),
+        ...(c.videoGames || []),
+        ...(c.shortFilms || []),
+      ].join(' ').toLowerCase()
+      return !LIVE_ACTION.some(kw => titles.includes(kw))
+    }
+
+    // Keep characters that have a usable image, a short recognisable name,
+    // and come from animated properties (not Marvel/Star Wars/live-action)
     const filtered = all.filter(c =>
       c.imageUrl &&
       c.name &&
@@ -37,7 +63,8 @@ const DISNEY = (() => {
       !c.imageUrl.includes('Question_mark') &&
       !c.imageUrl.includes('question_mark') &&
       !c.imageUrl.includes('No_image') &&
-      !c.imageUrl.includes('placeholder')
+      !c.imageUrl.includes('placeholder') &&
+      isAnimated(c)
     )
 
     sessionStorage.setItem(SESSION_KEY, JSON.stringify(filtered))
