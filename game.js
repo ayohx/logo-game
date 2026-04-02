@@ -289,7 +289,7 @@
           ? DISNEY.imgUrl(opt.imageUrl, 280)
           : logoUrl(opt.domain, CONFIG.optLogoSize)
         const altTxt = q.pack === 'disney' ? opt.name : opt.name
-        const showHint = !(q.pack === 'disney' && q.mode === 'name-to-image')
+        const showHint = !optAsImage
         card.innerHTML = `
           <span class="opt-key">${labels[i]}</span>
           <div class="opt-logo-wrap">
