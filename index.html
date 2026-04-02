@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="theme-color" content="#0d0d1a" />
-  <meta name="description" content="Logo Quiz — How well do you know the world's biggest brands?" />
+  <meta name="description" content="Logo Quiz — Brands & Disney characters" />
   <title>Logo Quiz</title>
   <link rel="stylesheet" href="style.css" />
 </head>
@@ -18,14 +18,25 @@
       <div id="logo-parade" class="logo-parade"></div>
 
       <h1 class="game-title">Logo<span class="accent">Quiz</span></h1>
-      <p class="subtitle">How well do you know the world's biggest brands?</p>
+      <p class="subtitle">How well do you know brands &amp; characters?</p>
 
       <div id="best-score" class="best-score"></div>
 
-      <div class="start-actions">
-        <button class="btn btn-primary btn-xl" id="btn-play">▶ Play Now</button>
-        <button class="btn btn-ghost" id="btn-history">View History</button>
+      <!-- Pack selector -->
+      <div class="pack-selector">
+        <button class="pack-card" id="btn-brands">
+          <span class="pack-icon">🏢</span>
+          <span class="pack-name">Brands</span>
+          <span class="pack-desc">Guess the world's biggest company logos</span>
+        </button>
+        <button class="pack-card pack-disney" id="btn-disney">
+          <span class="pack-icon">🏰</span>
+          <span class="pack-name">Disney</span>
+          <span class="pack-desc">Name the characters &amp; their films</span>
+        </button>
       </div>
+
+      <button class="btn btn-ghost btn-sm" id="btn-history">View History</button>
 
       <div class="input-hints">
         <span>🖱 Click</span>
@@ -37,22 +48,31 @@
     </div>
   </div>
 
+  <!-- ────────────────────────── LOADING SCREEN ───────────────────────── -->
+  <div id="screen-loading" class="screen">
+    <div class="loading-inner">
+      <div class="loading-spinner"></div>
+      <p id="loading-msg" class="loading-msg">Loading…</p>
+      <div class="loading-bar">
+        <div id="loading-bar-fill" class="loading-bar-fill"></div>
+      </div>
+    </div>
+  </div>
+
   <!-- ────────────────────────── GAME SCREEN ──────────────────────────── -->
   <div id="screen-game" class="screen">
 
     <!-- HUD -->
     <div class="hud">
       <span class="q-counter" id="q-counter">Q 1 / 10</span>
-
       <div class="hud-score">
         <div class="score-value" id="score-display">0</div>
         <div class="score-label">pts</div>
       </div>
-
       <span id="voice-indicator" class="voice-indicator hidden">🎤</span>
     </div>
 
-    <!-- Shuffle stage (slot-machine transition) -->
+    <!-- Shuffle stage -->
     <div id="shuffle-stage" class="shuffle-stage">
       <div class="shuffle-slot">
         <img id="shuffle-img" src="" alt="" class="hidden" />
@@ -63,11 +83,8 @@
 
     <!-- Active question -->
     <div id="question-stage" class="question-stage hidden">
-
       <div class="mode-badge" id="mode-badge"></div>
-
       <div class="prompt" id="prompt"></div>
-
       <div class="timer-wrap">
         <svg class="timer-ring" viewBox="0 0 100 100">
           <circle class="timer-track" cx="50" cy="50" r="45" />
@@ -75,54 +92,44 @@
         </svg>
         <div class="timer-number" id="timer-number">5</div>
       </div>
-
       <div class="options" id="options"></div>
-
       <p class="key-hint">
         Press <kbd>A</kbd> <kbd>B</kbd> <kbd>C</kbd> &nbsp;or&nbsp; <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd>
       </p>
-
     </div>
   </div>
 
   <!-- ────────────────────────── RESULTS SCREEN ───────────────────────── -->
   <div id="screen-results" class="screen">
     <div class="results-inner">
-
       <div class="rank-badge" id="rank-badge"></div>
       <div class="final-score" id="final-score"></div>
       <p class="final-label">out of 50 points</p>
-
       <div class="result-stats" id="result-stats"></div>
-
       <div class="breakdown" id="breakdown"></div>
-
       <div class="results-actions">
         <button class="btn btn-primary" id="btn-play-again">▶ Play Again</button>
+        <button class="btn btn-ghost btn-sm" id="btn-switch-pack">Change Pack</button>
         <button class="btn btn-ghost btn-sm" id="btn-results-history">History</button>
       </div>
-
     </div>
   </div>
 
   <!-- ────────────────────────── HISTORY SCREEN ───────────────────────── -->
   <div id="screen-history" class="screen">
     <div class="history-inner">
-
       <div class="history-header">
         <h2>Past Rounds</h2>
         <button class="btn btn-ghost btn-sm" id="btn-history-back">← Back</button>
       </div>
-
       <div id="history-list"></div>
-
     </div>
   </div>
 
-</div><!-- /#app -->
-
+</div>
 <script src="config.js"></script>
 <script src="logos.js"></script>
+<script src="disney.js"></script>
 <script src="audio.js"></script>
 <script src="speech.js"></script>
 <script src="game.js"></script>
