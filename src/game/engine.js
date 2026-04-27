@@ -7,6 +7,7 @@ import { runShuffle }         from '../ui/shuffle.js'
 import { saveToHistory, renderResults } from '../ui/history.js'
 import { startTimer, stopTimer, getTimerStart } from './timer.js'
 import { generateBrandQuestions } from './questions.js'
+import { LOG } from '../utils/logger.js'
 
 // ── State ─────────────────────────────────────────────────────────────────────
 const state = {
@@ -29,6 +30,8 @@ export async function startGame(pack) {
   state.score     = 0
   state.answers   = []
   state.questions = generateBrandQuestions()
+
+  LOG.event('game_start', { pack: state.pack, questions: state.questions.length })
 
   updateHUD(state.current, state.score, CONFIG.questionsPerGame)
   showScreen('game')
@@ -54,6 +57,8 @@ function showQuestion(q) {
   }
   $('mode-badge').textContent = badges[q.mode] || ''
 
+  LOG.event('question_show', { q: state.current + 1, mode: q.mode, domain: q.correct.domain, name: q.correct.name })
+
   // Prompt
   const prompt = $('prompt')
   prompt.innerHTML = ''
@@ -62,7 +67,10 @@ function showQuestion(q) {
     const img     = document.createElement('img')
     img.className = 'prompt-logo'
     img.alt       = 'Brand logo'
-    img.src       = logoUrl(q.correct.domain, CONFIG.logoSize)
+    const src     = logoUrl(q.correct.domain, CONFIG.logoSize)
+    img.onload    = () => LOG.event('img_load_ok',   { src })
+    img.onerror   = () => LOG.event('img_load_fail', { src, domain: q.correct.domain })
+    img.src       = src
     prompt.appendChild(img)
   } else {
     const span       = document.createElement('span')
@@ -84,12 +92,24 @@ function showQuestion(q) {
     card.dataset.index = i
 
     if (optAsImage) {
-      card.innerHTML = `
-        <div class="opt-logo-wrap">
-          <img src="${logoUrl(opt.domain, CONFIG.optLogoSize)}" alt="${opt.name}" class="opt-logo" />
-        </div>
-        <span class="opt-key">${labels[i]}</span>
-      `
+      const optSrc = logoUrl(opt.domain, CONFIG.optLogoSize)
+      const optImg = document.createElement('img')
+      optImg.src     = optSrc
+      optImg.alt     = opt.name
+      optImg.className = 'opt-logo'
+      optImg.onload  = () => LOG.event('img_load_ok',   { src: optSrc })
+      optImg.onerror = () => LOG.event('img_load_fail', { src: optSrc, domain: opt.domain })
+
+      const wrap = document.createElement('div')
+      wrap.className = 'opt-logo-wrap'
+      wrap.appendChild(optImg)
+
+      const key = document.createElement('span')
+      key.className   = 'opt-key'
+      key.textContent = labels[i]
+
+      card.appendChild(wrap)
+      card.appendChild(key)
     } else {
       card.innerHTML = `
         <span class="opt-key">${labels[i]}</span>
@@ -131,6 +151,8 @@ export function handleAnswer(idx) {
   const correct  = idx === q.correctIndex
   const points   = correct ? Math.max(0, Math.floor(secsLeft)) : 0
 
+  LOG.event('answer', { q: state.current + 1, correct, points, timedOut: idx === -1, domain: q.correct.domain })
+
   if (correct) { AUDIO.correct(); state.score += points }
   else         { AUDIO.wrong() }
 
@@ -163,6 +185,7 @@ function revealAnswer(q, chosenIdx, points, secsUsed) {
 
 // ── End game ──────────────────────────────────────────────────────────────────
 function endGame() {
+  LOG.event('game_end', { score: state.score, pack: state.pack, totalQuestions: state.answers.length })
   AUDIO.end(state.score)
   saveToHistory(state.score, state.pack, state.answers)
   renderResults(state.answers, state.score)

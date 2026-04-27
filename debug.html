@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Logo Quiz — Debug Log</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: monospace;
+      background: #0d0d1a;
+      color: #ccc;
+      padding: 20px;
+      font-size: 13px;
+    }
+    h1 { color: #fff; margin-bottom: 16px; font-size: 18px; }
+    .toolbar {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    button {
+      background: #1e1e30;
+      color: #ccc;
+      border: 1px solid #333;
+      padding: 6px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 12px;
+    }
+    button:hover { background: #2a2a44; }
+    button.danger { border-color: #e05; color: #f55; }
+    button.danger:hover { background: #300; }
+    #count { color: #888; font-size: 12px; }
+    #log { display: flex; flex-direction: column; gap: 4px; }
+    .entry {
+      display: grid;
+      grid-template-columns: 180px 150px 1fr;
+      gap: 8px;
+      padding: 6px 10px;
+      border-radius: 4px;
+      background: #13131f;
+      border-left: 3px solid #333;
+      align-items: start;
+    }
+    .entry.fail   { border-left-color: #e05; background: #1a0010; }
+    .entry.ok     { border-left-color: #0b5; }
+    .entry.start  { border-left-color: #36f; background: #0d0d22; }
+    .entry.end    { border-left-color: #fa0; background: #15110a; }
+    .entry.answer { border-left-color: #c6c; }
+    .ts    { color: #666; white-space: nowrap; }
+    .type  { color: #adf; font-weight: bold; }
+    .type.fail  { color: #f55; }
+    .type.ok    { color: #5d5; }
+    .type.start { color: #88f; }
+    .type.end   { color: #fa5; }
+    .data  { color: #888; word-break: break-all; }
+    .separator {
+      margin: 12px 0;
+      border-top: 1px solid #222;
+      color: #444;
+      font-size: 11px;
+      padding-top: 4px;
+    }
+    #empty { color: #555; margin-top: 40px; text-align: center; font-size: 14px; }
+  </style>
+</head>
+<body>
+
+<h1>Logo Quiz — Debug Log</h1>
+
+<div class="toolbar">
+  <button onclick="renderLog()">↻ Refresh</button>
+  <button class="danger" onclick="clearLogs()">🗑 Clear Logs</button>
+  <span id="count"></span>
+</div>
+
+<div id="log"></div>
+<div id="empty" style="display:none">No log entries found. Play a round first.</div>
+
+<script>
+  const KEY = 'lq_debug_log'
+
+  function load() {
+    try { return JSON.parse(localStorage.getItem(KEY) || '[]') } catch { return [] }
+  }
+
+  function entryClass(type) {
+    if (type === 'img_load_fail') return 'fail'
+    if (type === 'img_load_ok')   return 'ok'
+    if (type === 'game_start')    return 'start'
+    if (type === 'game_end')      return 'end'
+    if (type === 'answer')        return 'answer'
+    return ''
+  }
+
+  function formatData(data) {
+    return Object.entries(data)
+      .map(([k, v]) => `${k}=${typeof v === 'boolean' ? (v ? '✓' : '✗') : v}`)
+      .join('  ')
+  }
+
+  function renderLog() {
+    const entries = load().reverse()
+    const container = document.getElementById('log')
+    const empty     = document.getElementById('empty')
+    document.getElementById('count').textContent = `${entries.length} entries`
+
+    if (entries.length === 0) {
+      container.innerHTML = ''
+      empty.style.display = 'block'
+      return
+    }
+    empty.style.display = 'none'
+
+    let html = ''
+    let lastGame = null
+
+    entries.forEach(e => {
+      const cls   = entryClass(e.type)
+      const tsStr = e.ts ? e.ts.replace('T', ' ').replace('Z', '') : '?'
+      const game  = e.data?.q ? `Q${e.data.q}` : ''
+
+      if (e.type === 'game_start' && lastGame !== e.ts) {
+        lastGame = e.ts
+        html += `<div class="separator">── game session at ${tsStr} ──</div>`
+      }
+
+      html += `
+        <div class="entry ${cls}">
+          <span class="ts">${tsStr}</span>
+          <span class="type ${cls}">${e.type}</span>
+          <span class="data">${formatData(e.data || {})}</span>
+        </div>
+      `
+    })
+
+    container.innerHTML = html
+  }
+
+  function clearLogs() {
+    if (!confirm('Clear all debug logs?')) return
+    localStorage.removeItem(KEY)
+    renderLog()
+  }
+
+  renderLog()
+</script>
+</body>
+</html>
