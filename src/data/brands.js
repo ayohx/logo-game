@@ -122,4 +122,59 @@ export const LOGO_POOL = [
   { domain: 'airbnb.com',       name: 'Airbnb',          cat: 'Travel'       },
   { domain: 'uber.com',         name: 'Uber',            cat: 'Travel'       },
   { domain: 'booking.com',      name: 'Booking.com',     cat: 'Travel'       },
+
+  // ── UK Finance ────────────────────────────────────────────────────────────
+  { domain: 'barclays.com',     name: 'Barclays',        cat: 'Finance'      },
+  { domain: 'lloyds.com',       name: 'Lloyds',          cat: 'Finance'      },
+  { domain: 'natwest.com',      name: 'NatWest',         cat: 'Finance'      },
+  { domain: 'hsbc.com',         name: 'HSBC',            cat: 'Finance'      },
+  { domain: 'monzo.com',        name: 'Monzo',           cat: 'Finance'      },
+  { domain: 'revolut.com',      name: 'Revolut',         cat: 'Finance'      },
+
+  // ── UK Retail ─────────────────────────────────────────────────────────────
+  { domain: 'johnlewis.com',    name: 'John Lewis',      cat: 'Retail'       },
+  { domain: 'boots.com',        name: 'Boots',           cat: 'Retail'       },
+  { domain: 'primark.com',      name: 'Primark',         cat: 'Retail'       },
+  { domain: 'argos.co.uk',      name: 'Argos',           cat: 'Retail'       },
+  { domain: 'harrods.com',      name: 'Harrods',         cat: 'Retail'       },
+  { domain: 'superdry.com',     name: 'Superdry',        cat: 'Retail'       },
+  { domain: 'next.co.uk',       name: 'Next',            cat: 'Retail'       },
+
+  // ── UK Media & Broadcasting ───────────────────────────────────────────────
+  { domain: 'bbc.co.uk',        name: 'BBC',             cat: 'Media'        },
+  { domain: 'itv.com',          name: 'ITV',             cat: 'Media'        },
+  { domain: 'sky.com',          name: 'Sky',             cat: 'Media'        },
+  { domain: 'channel4.com',     name: 'Channel 4',       cat: 'Media'        },
+
+  // ── UK Telecoms ───────────────────────────────────────────────────────────
+  { domain: 'bt.com',           name: 'BT',              cat: 'Telecom'      },
+  { domain: 'vodafone.com',     name: 'Vodafone',        cat: 'Telecom'      },
+  { domain: 'virginmedia.com',  name: 'Virgin Media',    cat: 'Telecom'      },
+
+  // ── UK Auto (Prestige) ────────────────────────────────────────────────────
+  { domain: 'jaguar.com',       name: 'Jaguar',          cat: 'Auto'         },
+  { domain: 'bentley.com',      name: 'Bentley',         cat: 'Auto'         },
+  { domain: 'rolls-royce.com',  name: 'Rolls-Royce',     cat: 'Auto'         },
+  { domain: 'aston-martin.com', name: 'Aston Martin',    cat: 'Auto'         },
+  { domain: 'mini.com',         name: 'MINI',            cat: 'Auto'         },
+
+  // ── UK Travel ────────────────────────────────────────────────────────────
+  { domain: 'britishairways.com', name: 'British Airways', cat: 'Travel'     },
+  { domain: 'easyjet.com',      name: 'easyJet',         cat: 'Travel'       },
+  { domain: 'ryanair.com',      name: 'Ryanair',         cat: 'Travel'       },
+
+  // ── UK Energy & Industry ──────────────────────────────────────────────────
+  { domain: 'bp.com',           name: 'BP',              cat: 'Energy'       },
+  { domain: 'shell.com',        name: 'Shell',           cat: 'Energy'       },
+
+  // ── UK Food & Drink ───────────────────────────────────────────────────────
+  { domain: 'cadbury.com',      name: 'Cadbury',         cat: 'Food'         },
+  { domain: 'heinz.com',        name: 'Heinz',           cat: 'Food'         },
+  { domain: 'nandos.com',       name: "Nando's",         cat: 'Food'         },
+  { domain: 'greggs.co.uk',     name: 'Greggs',          cat: 'Food'         },
+  { domain: 'pret.com',         name: 'Pret A Manger',   cat: 'Food'         },
+
+  // ── UK Pharma / Healthcare ────────────────────────────────────────────────
+  { domain: 'gsk.com',          name: 'GSK',             cat: 'Pharma'       },
+  { domain: 'astrazeneca.com',  name: 'AstraZeneca',     cat: 'Pharma'       },
 ]
