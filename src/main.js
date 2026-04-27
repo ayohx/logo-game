@@ -7,7 +7,6 @@ import { CONFIG }      from './config.js'
 
 // ── Navigation buttons ────────────────────────────────────────────────────────
 $('btn-brands').addEventListener('click',  () => startGame('brands'))
-$('btn-disney').addEventListener('click',  () => startGame('disney'))
 
 $('btn-history').addEventListener('click', () => renderHistory())
 

@@ -1,6 +1,5 @@
 // ── History & Results rendering ───────────────────────────────────────────────
 import { $, logoUrl, showScreen } from './screens.js'
-import { DISNEY }                 from '../data/disney.js'
 import { LOGO_POOL }              from '../data/brands.js'
 import { CONFIG }                 from '../config.js'
 import { getRank, shuffle }       from '../utils/helpers.js'
@@ -52,24 +51,18 @@ export function renderResults(answers, score) {
   `
 
   $('breakdown').innerHTML = answers.map((a, i) => {
-    const label  = a.pack === 'disney' ? a.char.name : a.logo.name
-    const imgSrc = a.pack === 'disney'
-      ? DISNEY.imgUrl(a.char.imageUrl, 56)
-      : logoUrl(a.logo.domain, 28)
+    const label  = a.logo?.name || '?'
+    const imgSrc = logoUrl(a.logo?.domain, 28)
     const modeLbl = {
       'logo-to-name':  '🏷️',
       'name-to-logo':  '🖼️',
-      'image-to-name': '🎭',
-      'name-to-image': '🖼️',
-      'image-to-film': '🎬',
     }[a.mode] || ''
-    const detail = a.mode === 'image-to-film' ? ` → ${a.film}` : ''
 
     return `
       <div class="br-row ${a.correct ? 'br-correct' : 'br-wrong'}">
         <span class="br-num">Q${i + 1}</span>
         <img src="${imgSrc}" class="br-logo" alt="${label}" />
-        <span class="br-name">${label}${detail}</span>
+        <span class="br-name">${label}</span>
         <span class="br-mode">${modeLbl}</span>
         <span class="br-time">${a.timedOut ? 'timeout' : `${a.timeUsed.toFixed(1)}s`}</span>
         <span class="br-pts">${a.correct ? `<strong>+${a.pointsEarned}</strong>` : '—'}</span>
@@ -99,10 +92,9 @@ export function renderHistory(onResults) {
     const timeStr   = date.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })
     const correct   = g.answers.filter(a => a.correct).length
     const avgSecs   = (g.answers.reduce((s, a) => s + a.timeUsed, 0) / g.answers.length).toFixed(1)
-    const packBadge = g.pack === 'disney' ? '🏰' : '🏢'
 
     const rows = g.answers.map((a, qi) => {
-      const name    = a.pack === 'disney' ? (a.char?.name || '?') : (a.logo?.name || '?')
+      const name    = a.logo?.name || a.char?.name || '?'
       const modeLbl = {
         'logo-to-name':  '🏷️',
         'name-to-logo':  '🖼️',
@@ -124,7 +116,7 @@ export function renderHistory(onResults) {
         <summary class="history-summary">
           <span class="hs-emoji">${rank.emoji}</span>
           <div class="hs-info">
-            <div class="hs-score">${packBadge} ${g.score} pts — <em>${rank.label}</em></div>
+            <div class="hs-score">🏢 ${g.score} pts — <em>${rank.label}</em></div>
             <div class="hs-meta">${dateStr} · ${timeStr} · ${correct}/10 correct · avg ${avgSecs}s</div>
           </div>
           <span class="hs-arrow">›</span>

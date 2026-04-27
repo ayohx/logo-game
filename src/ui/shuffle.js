@@ -1,11 +1,10 @@
 // ── Slot-machine shuffle animation ───────────────────────────────────────────
 import { $, logoUrl, showStage } from './screens.js'
-import { DISNEY }                from '../data/disney.js'
 import { LOGO_POOL }             from '../data/brands.js'
 import { CONFIG }                from '../config.js'
 import { shuffle }               from '../utils/helpers.js'
 
-export function runShuffle(q, disneyPool) {
+export function runShuffle(q) {
   showStage('shuffle')
   const slotImg  = $('shuffle-img')
   const slotText = $('shuffle-text-name')
@@ -17,18 +16,13 @@ export function runShuffle(q, disneyPool) {
   slotText.style.color = ''
   label.textContent = 'Get ready…'
 
-  const showsImage = ['logo-to-name', 'image-to-name', 'image-to-film'].includes(q.mode)
+  const showsImage = q.mode === 'logo-to-name'
 
   return new Promise(resolve => {
     if (showsImage) {
       slotImg.classList.remove('hidden')
-      const targetSrc = q.pack === 'disney'
-        ? DISNEY.imgUrl(q.correct.imageUrl, 400)
-        : logoUrl(q.correct.domain, CONFIG.logoSize)
-
-      const cyclePool = q.pack === 'disney'
-        ? shuffle([...disneyPool]).slice(0, 20).map(c => DISNEY.imgUrl(c.imageUrl, 200))
-        : shuffle([...LOGO_POOL]).slice(0, 20).map(c => logoUrl(c.domain, CONFIG.logoSize))
+      const targetSrc  = logoUrl(q.correct.domain, CONFIG.logoSize)
+      const cyclePool  = shuffle([...LOGO_POOL]).slice(0, 20).map(c => logoUrl(c.domain, CONFIG.logoSize))
 
       let count = 0
       const total = 14
@@ -37,9 +31,7 @@ export function runShuffle(q, disneyPool) {
           slotImg.src = targetSrc
           slotImg.style.filter    = 'none'
           slotImg.style.transform = 'scale(1.08)'
-          label.textContent = q.mode === 'image-to-film'
-            ? `← Which film is ${q.correct.name} from?`
-            : q.pack === 'disney' ? '← Name this character' : '← Name this brand'
+          label.textContent = '← Name this brand'
           setTimeout(() => { slotImg.style.transform = 'scale(1)'; resolve() }, 420)
           return
         }
@@ -51,11 +43,9 @@ export function runShuffle(q, disneyPool) {
       step()
 
     } else {
-      // Text shuffle (name-to-logo or name-to-image)
+      // Text shuffle (name-to-logo)
       slotText.classList.remove('hidden')
-      const namePool = q.pack === 'disney'
-        ? shuffle([...disneyPool]).map(c => c.name)
-        : shuffle([...LOGO_POOL]).map(c => c.name)
+      const namePool = shuffle([...LOGO_POOL]).map(c => c.name)
 
       let count = 0
       const total = 12
@@ -63,7 +53,7 @@ export function runShuffle(q, disneyPool) {
         if (count >= total) {
           slotText.textContent  = q.correct.name
           slotText.style.color  = 'var(--warning)'
-          label.textContent     = q.pack === 'disney' ? '← Find the character' : '← Find the logo'
+          label.textContent     = '← Find the logo'
           setTimeout(resolve, 420)
           return
         }
