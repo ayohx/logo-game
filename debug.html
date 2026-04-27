@@ -6,88 +6,162 @@
   <title>Logo Quiz — Debug Log</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: monospace;
-      background: #0d0d1a;
-      color: #ccc;
-      padding: 20px;
-      font-size: 13px;
-    }
-    h1 { color: #fff; margin-bottom: 16px; font-size: 18px; }
-    .toolbar {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 20px;
-      align-items: center;
-      flex-wrap: wrap;
-    }
-    button {
-      background: #1e1e30;
-      color: #ccc;
-      border: 1px solid #333;
-      padding: 6px 14px;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 12px;
-    }
+    body { font-family: monospace; background: #0d0d1a; color: #ccc; padding: 20px; font-size: 13px; }
+    h1   { color: #fff; margin-bottom: 4px; font-size: 18px; }
+    .sub { color: #555; font-size: 12px; margin-bottom: 20px; }
+
+    /* tabs */
+    .tabs { display: flex; gap: 4px; margin-bottom: 20px; }
+    .tab  { padding: 6px 16px; border-radius: 20px; border: 1px solid #333; cursor: pointer; background: #13131f; color: #888; font-size: 12px; }
+    .tab.active { background: #7c6af0; border-color: #7c6af0; color: #fff; }
+
+    .toolbar { display: flex; gap: 10px; margin-bottom: 16px; align-items: center; flex-wrap: wrap; }
+    button   { background: #1e1e30; color: #ccc; border: 1px solid #333; padding: 6px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; }
     button:hover { background: #2a2a44; }
     button.danger { border-color: #e05; color: #f55; }
     button.danger:hover { background: #300; }
     #count { color: #888; font-size: 12px; }
+
+    /* ── FLAT LOG ─────────────────── */
+    #tab-flat { display: block; }
+    #tab-sessions { display: none; }
     #log { display: flex; flex-direction: column; gap: 4px; }
     .entry {
-      display: grid;
-      grid-template-columns: 180px 150px 1fr;
-      gap: 8px;
-      padding: 6px 10px;
-      border-radius: 4px;
-      background: #13131f;
-      border-left: 3px solid #333;
-      align-items: start;
+      display: grid; grid-template-columns: 180px 150px 1fr; gap: 8px;
+      padding: 6px 10px; border-radius: 4px; background: #13131f;
+      border-left: 3px solid #333; align-items: start;
     }
     .entry.fail   { border-left-color: #e05; background: #1a0010; }
     .entry.ok     { border-left-color: #0b5; }
     .entry.start  { border-left-color: #36f; background: #0d0d22; }
     .entry.end    { border-left-color: #fa0; background: #15110a; }
     .entry.answer { border-left-color: #c6c; }
-    .ts    { color: #666; white-space: nowrap; }
-    .type  { color: #adf; font-weight: bold; }
-    .type.fail  { color: #f55; }
-    .type.ok    { color: #5d5; }
-    .type.start { color: #88f; }
-    .type.end   { color: #fa5; }
-    .data  { color: #888; word-break: break-all; }
-    .separator {
-      margin: 12px 0;
-      border-top: 1px solid #222;
-      color: #444;
-      font-size: 11px;
-      padding-top: 4px;
+    .ts   { color: #666; white-space: nowrap; }
+    .etype      { color: #adf; font-weight: bold; }
+    .etype.fail  { color: #f55; }
+    .etype.ok    { color: #5d5; }
+    .etype.start { color: #88f; }
+    .etype.end   { color: #fa5; }
+    .edata { color: #888; word-break: break-all; }
+    .sep { margin: 12px 0; border-top: 1px solid #222; color: #444; font-size: 11px; padding-top: 4px; }
+
+    /* ── SESSIONS ─────────────────── */
+    .session-card {
+      background: #13131f; border: 1px solid #222; border-radius: 8px;
+      margin-bottom: 8px; overflow: hidden;
     }
+    .session-header {
+      display: flex; align-items: center; gap: 12px; padding: 10px 14px;
+      cursor: pointer; user-select: none;
+    }
+    .session-header:hover { background: #1a1a2e; }
+    .session-date  { color: #888; font-size: 11px; white-space: nowrap; }
+    .session-score { color: #7c6af0; font-weight: bold; min-width: 52px; }
+    .session-info  { color: #aaa; flex: 1; font-size: 12px; }
+    .session-badge {
+      font-size: 10px; padding: 2px 8px; border-radius: 12px; background: #1e1e30;
+      color: #888; border: 1px solid #333; white-space: nowrap;
+    }
+    .session-expand { color: #555; font-size: 14px; transition: transform 0.2s; }
+    .session-card.open .session-expand { transform: rotate(90deg); }
+
+    /* question list */
+    .q-list   { border-top: 1px solid #1e1e30; }
+    .q-row    { padding: 10px 14px; border-bottom: 1px solid #1a1a28; display: flex; flex-direction: column; gap: 6px; }
+    .q-row:last-child { border-bottom: none; }
+    .q-meta   { display: flex; gap: 10px; align-items: center; }
+    .q-num    { color: #555; font-size: 11px; min-width: 28px; }
+    .q-mode   { font-size: 11px; padding: 2px 7px; border-radius: 10px; background: #1e1e30; color: #88f; }
+    .q-result { font-size: 11px; padding: 2px 8px; border-radius: 10px; }
+    .q-result.correct { background: rgba(67,233,123,0.15); color: #43e97b; }
+    .q-result.wrong   { background: rgba(245,54,92,0.15);  color: #f5365c; }
+    .q-result.timeout { background: rgba(255,209,102,0.15); color: #ffd166; }
+    .q-pts    { font-size: 11px; color: #888; }
+
+    /* prompt area */
+    .q-prompt { display: flex; align-items: center; gap: 10px; }
+    .q-prompt-img {
+      width: 52px; height: 52px; object-fit: contain; border-radius: 8px;
+      background: #1a1a2e; border: 1px solid #2a2a44; padding: 4px;
+    }
+    .q-prompt-name { font-size: 1rem; font-weight: 700; color: #fff; padding: 8px 14px; background: #1a1a2e; border-radius: 8px; }
+    .q-prompt-label { font-size: 11px; color: #555; }
+
+    /* options row */
+    .q-options { display: flex; gap: 8px; flex-wrap: wrap; }
+    .q-opt {
+      display: flex; flex-direction: column; align-items: center; gap: 4px;
+      padding: 6px 8px; border-radius: 8px; background: #1a1a28; border: 1px solid #222;
+      min-width: 64px;
+    }
+    .q-opt.correct-opt { border-color: #43e97b; background: rgba(67,233,123,0.08); }
+    .q-opt.chosen-opt  { border-color: #7c6af0; background: rgba(124,106,240,0.1); }
+    .q-opt.wrong-chosen { border-color: #f5365c; background: rgba(245,54,92,0.08); }
+    .q-opt img {
+      width: 40px; height: 40px; object-fit: contain; border-radius: 5px;
+      background: #13131f; padding: 2px;
+    }
+    .opt-name   { font-size: 10px; color: #888; text-align: center; }
+    .opt-status { font-size: 10px; }
+    .opt-status.ok   { color: #43e97b; }
+    .opt-status.fail { color: #f5365c; }
+    .opt-status.none { color: #555; }
+
     #empty { color: #555; margin-top: 40px; text-align: center; font-size: 14px; }
   </style>
 </head>
 <body>
 
-<h1>Logo Quiz — Debug Log</h1>
+<h1>Logo Quiz — Debug</h1>
+<p class="sub">Session data auto-purges after 12 hours. Flat log capped at 500 events.</p>
 
-<div class="toolbar">
-  <button onclick="renderLog()">↻ Refresh</button>
-  <button class="danger" onclick="clearLogs()">🗑 Clear Logs</button>
-  <span id="count"></span>
+<div class="tabs">
+  <div class="tab active" onclick="switchTab('sessions')">Sessions</div>
+  <div class="tab" onclick="switchTab('flat')">Flat Log</div>
 </div>
 
-<div id="log"></div>
-<div id="empty" style="display:none">No log entries found. Play a round first.</div>
+<!-- SESSIONS TAB -->
+<div id="tab-sessions">
+  <div class="toolbar">
+    <button onclick="renderSessions()">↻ Refresh</button>
+    <button class="danger" onclick="clearSessions()">🗑 Clear Sessions</button>
+    <span id="sess-count"></span>
+  </div>
+  <div id="sessions-list"></div>
+</div>
+
+<!-- FLAT LOG TAB -->
+<div id="tab-flat" style="display:none">
+  <div class="toolbar">
+    <button onclick="renderFlatLog()">↻ Refresh</button>
+    <button class="danger" onclick="clearFlatLog()">🗑 Clear Log</button>
+    <span id="count"></span>
+  </div>
+  <div id="log"></div>
+</div>
+
+<div id="empty" style="display:none">No data found. Play a round first.</div>
 
 <script>
-  const KEY = 'lq_debug_log'
+  const EVENTS_KEY   = 'lq_debug_log'
+  const SESSIONS_KEY = 'lq_sessions'
 
-  function load() {
-    try { return JSON.parse(localStorage.getItem(KEY) || '[]') } catch { return [] }
+  // ── Tab switching ──────────────────────────────────────────────────────────
+  function switchTab(tab) {
+    document.querySelectorAll('.tab').forEach((t, i) => {
+      t.classList.toggle('active', (tab === 'sessions' && i === 0) || (tab === 'flat' && i === 1))
+    })
+    document.getElementById('tab-sessions').style.display = tab === 'sessions' ? 'block' : 'none'
+    document.getElementById('tab-flat').style.display     = tab === 'flat'     ? 'block' : 'none'
+    if (tab === 'sessions') renderSessions()
+    else renderFlatLog()
   }
 
-  function entryClass(type) {
+  // ── Flat log ───────────────────────────────────────────────────────────────
+  function loadEvents()   { try { return JSON.parse(localStorage.getItem(EVENTS_KEY)   || '[]') } catch { return [] } }
+  function loadSessions() { try { return JSON.parse(localStorage.getItem(SESSIONS_KEY) || '[]') } catch { return [] } }
+
+  function evtClass(type) {
     if (type === 'img_load_fail') return 'fail'
     if (type === 'img_load_ok')   return 'ok'
     if (type === 'game_start')    return 'start'
@@ -96,57 +170,155 @@
     return ''
   }
 
-  function formatData(data) {
-    return Object.entries(data)
-      .map(([k, v]) => `${k}=${typeof v === 'boolean' ? (v ? '✓' : '✗') : v}`)
-      .join('  ')
+  function fmtData(data) {
+    return Object.entries(data).map(([k, v]) => `${k}=${typeof v === 'boolean' ? (v ? '✓' : '✗') : v}`).join('  ')
   }
 
-  function renderLog() {
-    const entries = load().reverse()
+  function renderFlatLog() {
+    const entries   = loadEvents().reverse()
     const container = document.getElementById('log')
     const empty     = document.getElementById('empty')
     document.getElementById('count').textContent = `${entries.length} entries`
-
-    if (entries.length === 0) {
-      container.innerHTML = ''
-      empty.style.display = 'block'
-      return
-    }
+    if (!entries.length) { container.innerHTML = ''; empty.style.display = 'block'; return }
     empty.style.display = 'none'
-
-    let html = ''
-    let lastGame = null
-
+    let html = '', lastGame = null
     entries.forEach(e => {
-      const cls   = entryClass(e.type)
-      const tsStr = e.ts ? e.ts.replace('T', ' ').replace('Z', '') : '?'
-      const game  = e.data?.q ? `Q${e.data.q}` : ''
-
+      const cls   = evtClass(e.type)
+      const tsStr = (e.ts || '').replace('T',' ').replace('Z','')
       if (e.type === 'game_start' && lastGame !== e.ts) {
         lastGame = e.ts
-        html += `<div class="separator">── game session at ${tsStr} ──</div>`
+        html += `<div class="sep">── game session at ${tsStr} ──</div>`
       }
-
-      html += `
-        <div class="entry ${cls}">
-          <span class="ts">${tsStr}</span>
-          <span class="type ${cls}">${e.type}</span>
-          <span class="data">${formatData(e.data || {})}</span>
-        </div>
-      `
+      html += `<div class="entry ${cls}"><span class="ts">${tsStr}</span><span class="etype ${cls}">${e.type}</span><span class="edata">${fmtData(e.data||{})}</span></div>`
     })
-
     container.innerHTML = html
   }
 
-  function clearLogs() {
-    if (!confirm('Clear all debug logs?')) return
-    localStorage.removeItem(KEY)
-    renderLog()
+  function clearFlatLog() {
+    if (!confirm('Clear flat log?')) return
+    localStorage.removeItem(EVENTS_KEY)
+    renderFlatLog()
   }
 
-  renderLog()
+  // ── Sessions ───────────────────────────────────────────────────────────────
+  function fmtDate(iso) {
+    try { return new Date(iso).toLocaleString('en-GB', { day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' }) }
+    catch { return iso }
+  }
+
+  function renderSessions() {
+    const sessions  = loadSessions().slice().reverse()
+    const container = document.getElementById('sessions-list')
+    const empty     = document.getElementById('empty')
+    document.getElementById('sess-count').textContent = `${sessions.length} session${sessions.length !== 1 ? 's' : ''}`
+    if (!sessions.length) { container.innerHTML = ''; empty.style.display = 'block'; return }
+    empty.style.display = 'none'
+
+    container.innerHTML = sessions.map((s, i) => {
+      const qCount    = s.questions ? s.questions.length : 0
+      const answered  = s.questions ? s.questions.filter(q => q.answered).length : 0
+      const failCount = s.questions ? s.questions.reduce((n, q) => n + Object.values(q.imgResults || {}).filter(r => !r.ok).length, 0) : 0
+      const failBadge = failCount ? `<span class="session-badge" style="border-color:#e05;color:#f55">⚠ ${failCount} img fail${failCount>1?'s':''}</span>` : ''
+      return `
+        <div class="session-card" id="sc-${i}">
+          <div class="session-header" onclick="toggleSession(${i})">
+            <span class="session-date">${fmtDate(s.startedAt)}</span>
+            <span class="session-score">${s.score !== null ? s.score : '—'}/50</span>
+            <span class="session-info">${s.pack || 'brands'} · ${answered}/${qCount} answered</span>
+            ${failBadge}
+            <span class="session-expand">▶</span>
+          </div>
+          <div class="q-list" id="ql-${i}" style="display:none">
+            ${renderQuestions(s.questions || [])}
+          </div>
+        </div>
+      `
+    }).join('')
+  }
+
+  function renderQuestions(questions) {
+    if (!questions.length) return '<div style="padding:12px;color:#555">No questions recorded</div>'
+    return questions.map(q => {
+      const resultLabel = q.timedOut ? 'timed out' : q.correct ? 'correct' : 'wrong'
+      const resultCls   = q.timedOut ? 'timeout' : q.correct ? 'correct' : 'wrong'
+
+      // prompt
+      let promptHtml = ''
+      if (q.mode === 'logo-to-name') {
+        const ir  = (q.imgResults || {})[q.prompt.domain]
+        const st  = ir ? (ir.ok ? 'ok' : 'fail') : 'none'
+        const stl = ir ? (ir.ok ? '✓ loaded' : '✗ failed') : '? unknown'
+        promptHtml = `
+          <div class="q-prompt">
+            <img class="q-prompt-img" src="${ir && ir.src ? ir.src : ''}"
+              alt="${q.prompt.name}" onerror="this.style.opacity='0.2'"
+              title="${q.prompt.domain}" />
+            <div>
+              <div class="q-prompt-label">Shown logo</div>
+              <div style="color:#aaa;font-size:12px">${q.prompt.name} (${q.prompt.domain})</div>
+              <div class="opt-status ${st}">${stl}</div>
+            </div>
+          </div>`
+      } else {
+        promptHtml = `
+          <div class="q-prompt">
+            <span class="q-prompt-name">${q.prompt.name}</span>
+            <span class="q-prompt-label" style="margin-left:8px">Shown text → pick logo</span>
+          </div>`
+      }
+
+      // options
+      const optHtml = (q.options || []).map((opt, oi) => {
+        const ir  = (q.imgResults || {})[opt.domain]
+        const st  = ir ? (ir.ok ? 'ok' : 'fail') : 'none'
+        const stl = ir ? (ir.ok ? '✓' : '✗') : '?'
+        const isCorrect = oi === q.correctIndex
+        const isChosen  = oi === q.chosenIndex
+        let cls = ''
+        if (isCorrect && isChosen) cls = 'correct-opt chosen-opt'
+        else if (isCorrect)        cls = 'correct-opt'
+        else if (isChosen)         cls = 'wrong-chosen'
+
+        const marker = isCorrect ? ' ✓' : (isChosen ? ' ✗' : '')
+        const src    = ir && ir.src ? ir.src : `https://img.logo.dev/${opt.domain}?token=pk_IO39bLgkTxCsv16Mo3TJJA&size=80&format=png`
+        return `
+          <div class="q-opt ${cls}" title="${opt.domain}">
+            <img src="${src}" alt="${opt.name}" onerror="this.style.opacity='0.15'" />
+            <span class="opt-name">${opt.name}${marker}</span>
+            <span class="opt-status ${st}">${stl}</span>
+          </div>`
+      }).join('')
+
+      return `
+        <div class="q-row">
+          <div class="q-meta">
+            <span class="q-num">Q${q.qNum}</span>
+            <span class="q-mode">${q.mode}</span>
+            <span class="q-result ${resultCls}">${resultLabel}</span>
+            <span class="q-pts">${q.points > 0 ? `+${q.points}pts` : ''}</span>
+          </div>
+          ${promptHtml}
+          <div class="q-options">${optHtml}</div>
+        </div>`
+    }).join('')
+  }
+
+  function toggleSession(i) {
+    const card = document.getElementById(`sc-${i}`)
+    const ql   = document.getElementById(`ql-${i}`)
+    const isOpen = card.classList.contains('open')
+    card.classList.toggle('open', !isOpen)
+    ql.style.display = isOpen ? 'none' : 'block'
+  }
+
+  function clearSessions() {
+    if (!confirm('Clear all sessions?')) return
+    localStorage.removeItem(SESSIONS_KEY)
+    renderSessions()
+  }
+
+  // ── Boot ───────────────────────────────────────────────────────────────────
+  renderSessions()
 </script>
 </body>
 </html>

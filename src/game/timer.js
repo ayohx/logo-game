@@ -5,18 +5,42 @@ import { AUDIO }  from '../utils/audio.js'
 
 const CIRC = 2 * Math.PI * 45   // SVG timer circle circumference ≈ 282.74
 
-let rafId      = null
-let timerStart = null
+let rafId         = null
+let timerStart    = null
+let _pauseElapsed = 0   // ms elapsed when pauseTimer() was called
 
 export function getTimerStart() { return timerStart }
 
 export function startTimer(q, onTimeout) {
   stopTimer()
-  timerStart = performance.now()
+  _pauseElapsed = 0
+  timerStart    = performance.now()
+  _runTick(q, onTimeout)
+}
+
+export function pauseTimer() {
+  if (rafId === null) return
+  cancelAnimationFrame(rafId)
+  rafId = null
+  _pauseElapsed = performance.now() - timerStart
+}
+
+export function resumeTimer(q, onTimeout) {
+  if (timerStart === null) return
+  timerStart = performance.now() - _pauseElapsed
+  _runTick(q, onTimeout)
+}
+
+export function stopTimer() {
+  if (rafId) { cancelAnimationFrame(rafId); rafId = null }
+}
+
+function _runTick(q, onTimeout) {
   const duration = CONFIG.timePerQuestion * 1000
   const arc      = $('timer-arc')
   const numEl    = $('timer-number')
-  let lastWhole  = CONFIG.timePerQuestion
+  // start lastWhole from current remaining so ticks fire correctly on resume
+  let lastWhole  = Math.ceil((duration - _pauseElapsed) / 1000)
 
   function tick(now) {
     const elapsed   = now - timerStart
@@ -43,8 +67,4 @@ export function startTimer(q, onTimeout) {
   }
 
   rafId = requestAnimationFrame(tick)
-}
-
-export function stopTimer() {
-  if (rafId) { cancelAnimationFrame(rafId); rafId = null }
 }

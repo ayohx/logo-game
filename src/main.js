@@ -2,7 +2,7 @@
 import { AUDIO }       from './utils/audio.js'
 import { $, showScreen }  from './ui/screens.js'
 import { updateBestScore, initLogoParade, renderResults, renderHistory } from './ui/history.js'
-import { startGame, handleAnswer, getState } from './game/engine.js'
+import { startGame, handleAnswer, pauseGame, resumeGame, getState } from './game/engine.js'
 import { CONFIG }      from './config.js'
 
 // ── Navigation buttons ────────────────────────────────────────────────────────
@@ -38,6 +38,14 @@ $('btn-history-back').addEventListener('click', () => {
   }
 })
 
+// ── Pause button ──────────────────────────────────────────────────────────────
+$('btn-pause').addEventListener('click', () => {
+  const { paused } = getState()
+  paused ? resumeGame() : pauseGame()
+})
+
+$('btn-resume').addEventListener('click', () => resumeGame())
+
 // ── Volume control ────────────────────────────────────────────────────────────
 const volSlider = $('volume-slider')
 const volBtn    = $('btn-volume')
@@ -61,7 +69,14 @@ document.addEventListener('click', () => {
 
 // ── Keyboard shortcuts ────────────────────────────────────────────────────────
 document.addEventListener('keydown', e => {
-  const { answering } = getState()
+  const { answering, paused } = getState()
+
+  // P key — pause/resume toggle
+  if (e.key === 'p' || e.key === 'P') {
+    paused ? resumeGame() : pauseGame()
+    return
+  }
+
   if (!answering) return
   const map = { '1': 0, a: 0, A: 0, '2': 1, b: 1, B: 1, '3': 2, c: 2, C: 2 }
   if (map[e.key] !== undefined) handleAnswer(map[e.key])

@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="theme-color" content="#0d0d1a" />
-  <meta name="description" content="Logo Quiz — Brands & Disney characters" />
+  <meta name="description" content="Logo Quiz — Brands &amp; Characters" />
   <title>Logo Quiz</title>
   <link rel="icon" type="image/svg+xml" href="favicon.svg" />
   <link rel="stylesheet" href="style.css" />
@@ -39,7 +39,10 @@
         <span>👆 Tap</span>
         <span>⌨️ A / B / C</span>
         <span>🎤 Voice</span>
+        <span>⏸ P = Pause</span>
       </div>
+
+      <p class="scoring-hint">⚡ Answer faster for more points — up to 5 pts per question, 50 total</p>
 
     </div>
   </div>
@@ -67,7 +70,7 @@
         <div class="score-label">pts</div>
       </div>
 
-      <!-- Mic meter + volume control (right side) -->
+      <!-- Mic meter + pause + volume (right side) -->
       <div class="hud-right">
         <!-- Animated mic meter — visible when listening -->
         <div id="mic-meter" class="mic-meter">
@@ -80,6 +83,9 @@
           </div>
         </div>
         <span id="voice-indicator" class="hidden"></span>
+
+        <!-- Pause button -->
+        <button id="btn-pause" class="pause-btn" title="Pause (P)">⏸</button>
 
         <!-- Volume control -->
         <div class="vol-wrap">
@@ -115,8 +121,20 @@
       <div class="options" id="options"></div>
       <p class="key-hint">
         Press <kbd>A</kbd> <kbd>B</kbd> <kbd>C</kbd> &nbsp;or&nbsp; <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd>
+        &nbsp;&nbsp;<kbd>P</kbd> = Pause
       </p>
     </div>
+
+    <!-- Pause overlay -->
+    <div id="pause-overlay" class="pause-overlay hidden">
+      <div class="pause-content">
+        <div class="pause-icon">⏸</div>
+        <p class="pause-title">PAUSED</p>
+        <button class="btn btn-primary" id="btn-resume">▶ Resume</button>
+        <p class="pause-hint">Press <kbd>P</kbd> to resume</p>
+      </div>
+    </div>
+
   </div>
 
   <!-- ────────────────────────── RESULTS SCREEN ───────────────────────── -->
