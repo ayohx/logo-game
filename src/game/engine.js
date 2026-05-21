@@ -6,7 +6,7 @@ import { $, logoUrl, showScreen, showStage, showScorePop, updateHUD } from '../u
 import { runShuffle }         from '../ui/shuffle.js'
 import { saveToHistory, renderResults } from '../ui/history.js'
 import { startTimer, stopTimer, pauseTimer, resumeTimer, getTimerStart } from './timer.js'
-import { generateBrandQuestions } from './questions.js'
+import { generateQuestions } from './questions.js'
 import { LOG } from '../utils/logger.js'
 import { startLeaderboardGame, submitLeaderboardScore } from '../utils/leaderboard.js'
 
@@ -30,7 +30,8 @@ export function getState() { return state }
 // ── Game lifecycle ────────────────────────────────────────────────────────────
 export async function startGame(pack, playerName = '') {
   AUDIO.resume()
-  const leaderboardSession = await startLeaderboardGame(playerName)
+  const selectedPack = pack || 'brands'
+  const leaderboardSession = await startLeaderboardGame(playerName, selectedPack)
   state.pack      = pack || 'brands'
   state.current   = 0
   state.score     = 0
@@ -40,7 +41,7 @@ export async function startGame(pack, playerName = '') {
   state.sessionId = leaderboardSession.sessionId
   state.playerName = leaderboardSession.playerName
   state.leaderboardResult = null
-  state.questions = leaderboardSession.questions || generateBrandQuestions()
+  state.questions = leaderboardSession.questions || generateQuestions(state.pack)
 
   LOG.event('game_start', { pack: state.pack, questions: state.questions.length })
   LOG.startSession(state.pack)

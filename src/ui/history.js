@@ -1,7 +1,7 @@
 // ── History & Results rendering ───────────────────────────────────────────────
 import { $, logoUrl, showScreen } from './screens.js'
-import { LOGO_POOL }              from '../data/brands.js'
 import { CONFIG }                 from '../config.js'
+import { getPackPool }            from '../game/questions.js'
 import { getRank, shuffle }       from '../utils/helpers.js'
 
 export function getHistory() {
@@ -28,9 +28,9 @@ export function updateBestScore() {
   el.innerHTML = `Best: <strong>${best}</strong> pts ${getRank(best).emoji}`
 }
 
-export function initLogoParade() {
+export function initLogoParade(pack = 'brands') {
   const parade = $('logo-parade')
-  const sample = shuffle([...LOGO_POOL]).slice(0, 10)
+  const sample = shuffle([...getPackPool(pack)]).slice(0, 6)
   parade.innerHTML = sample.map(l =>
     `<div class="parade-item"><img src="${logoUrl(l.domain, 56)}" alt="${l.name}" loading="lazy" /></div>`
   ).join('')

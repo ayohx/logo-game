@@ -13,6 +13,7 @@ const profileAvatarInput = $('profile-avatar')
 const nameHelp = $('name-help')
 let activeProfile = getPlayerProfile()
 let selectedEmoji = activeProfile.avatarType === 'emoji' ? emojiFromAvatarValue(activeProfile.avatarValue) : ''
+let selectedPack = 'brands'
 
 function initialsForName(name) {
   return normalisePlayerName(name).replace(/[^A-Za-z0-9]/g, '').slice(0, 2).toUpperCase() || '??'
@@ -79,12 +80,21 @@ $('btn-save-profile').addEventListener('click', async () => {
   }
 })
 
-$('btn-brands').addEventListener('click', () => {
-  $('selected-pack').textContent = 'Mix Brands is selected. Press Start Game when you are ready.'
-  $('btn-start-game').focus()
-})
+$('btn-brands').addEventListener('click', () => selectPack('brands'))
+$('btn-travel').addEventListener('click', () => selectPack('travel'))
 
 $('btn-start-game').addEventListener('click', () => startSelectedGame())
+
+function selectPack(pack) {
+  selectedPack = pack
+  const isTravel = pack === 'travel'
+  $('btn-brands').classList.toggle('is-selected', !isTravel)
+  $('btn-travel').classList.toggle('is-selected', isTravel)
+  $('btn-brands').setAttribute('aria-pressed', String(!isTravel))
+  $('btn-travel').setAttribute('aria-pressed', String(isTravel))
+  $('selected-pack').textContent = `${isTravel ? 'Travel & Adventure' : 'Mix Brands'} is selected. Press Start Game when you are ready.`
+  initLogoParade(pack)
+}
 
 async function startSelectedGame() {
   const profile = getProfileFromForm()
@@ -98,7 +108,7 @@ async function startSelectedGame() {
   if (nameHelp) nameHelp.textContent = 'Starting shared game...'
 
   try {
-    await startGame('brands', activeProfile)
+    await startGame(selectedPack, activeProfile)
   } catch (error) {
     if (nameHelp) nameHelp.textContent = error instanceof Error ? error.message : 'Could not start the shared game.'
   }
@@ -124,7 +134,8 @@ $('btn-leaderboard').addEventListener('click', () => renderLeaderboard())
 
 $('btn-play-again').addEventListener('click', () => {
   const { pack } = getState()
-  startGame(pack, activeProfile)
+  selectedPack = pack || selectedPack
+  startGame(selectedPack, activeProfile)
 })
 
 $('btn-switch-pack').addEventListener('click', () => {

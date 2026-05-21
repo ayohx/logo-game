@@ -95,14 +95,14 @@ export async function savePlayerProfile(profile) {
   })
 }
 
-export async function startLeaderboardGame(profile) {
+export async function startLeaderboardGame(profile, pack = 'brands') {
   const saved = saveProfileLocally(profile)
   const cleanName = normalisePlayerName(saved.displayName)
   if (cleanName.length < 2) throw new Error('Enter your name before you play.')
 
   return callFunction('logo-game-start', {
     method: 'POST',
-    body: JSON.stringify(saved),
+    body: JSON.stringify({ ...saved, pack }),
   })
 }
 

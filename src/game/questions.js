@@ -1,7 +1,17 @@
 // ── Question generation ───────────────────────────────────────────────────────
 import { CONFIG }     from '../config.js'
 import { LOGO_POOL }  from '../data/brands.js'
+import { TRAVEL_POOL } from '../data/travel.js'
 import { shuffle }    from '../utils/helpers.js'
+
+export const PACK_POOLS = {
+  brands: LOGO_POOL,
+  travel: TRAVEL_POOL,
+}
+
+export function getPackPool(pack = 'brands') {
+  return PACK_POOLS[pack] || PACK_POOLS.brands
+}
 
 function categoryOf(item) {
   return item.cat || 'Other'
@@ -69,7 +79,7 @@ function buildModeBag(count, shuffleFn) {
   ])
 }
 
-export function buildBrandQuestions(pool, { count = CONFIG.questionsPerGame, shuffleFn = shuffle } = {}) {
+export function buildBrandQuestions(pool, { count = CONFIG.questionsPerGame, shuffleFn = shuffle, pack = 'brands' } = {}) {
   const selected = pickBalancedCorrects(pool, count, shuffleFn)
   const modes    = buildModeBag(count, shuffleFn)
   const usedDistractors = new Set()
@@ -78,11 +88,15 @@ export function buildBrandQuestions(pool, { count = CONFIG.questionsPerGame, shu
     const mode    = modes.pop() || 'logo-to-name'
     const others  = pickDistractors(pool, correct, selected, usedDistractors, shuffleFn)
     const options = shuffleFn([correct, ...others])
-    return { pack: 'brands', correct, mode, options, correctIndex: options.indexOf(correct) }
+    return { pack, correct, mode, options, correctIndex: options.indexOf(correct) }
   })
 }
 
+export function generateQuestions(pack = 'brands') {
+  const pool = shuffle([...getPackPool(pack)])
+  return buildBrandQuestions(pool, { count: CONFIG.questionsPerGame, pack })
+}
+
 export function generateBrandQuestions() {
-  const pool     = shuffle([...LOGO_POOL])
-  return buildBrandQuestions(pool, { count: CONFIG.questionsPerGame })
+  return generateQuestions('brands')
 }

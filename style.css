@@ -1002,10 +1002,11 @@ details[open] .hs-arrow { transform: rotate(90deg); }
 /* ──────────────────────────────────────────────────────────────────────── */
 
 .pack-selector {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 12px;
   width: 100%;
-  max-width: 380px;
+  max-width: 520px;
 }
 
 .pack-card {
@@ -1214,6 +1215,7 @@ details[open] .hs-arrow { transform: rotate(90deg); }
 /* ──────────────────────────────────────────────────────────────────────── */
 @media (max-width: 380px) {
   .game-title { font-size: 2.2rem; }
+  .pack-selector { grid-template-columns: 1fr; }
   .options-logo .option-card { width: calc(33.333% - 6px); min-width: 86px; }
   .br-row { grid-template-columns: 24px 24px 1fr 20px 38px 28px; gap: 5px; padding: 8px 10px; }
   .question-feedback { font-size: 0.76rem; }

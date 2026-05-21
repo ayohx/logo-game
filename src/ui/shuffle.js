@@ -1,8 +1,7 @@
 // ── Slot-machine shuffle animation ───────────────────────────────────────────
 import { $, logoUrl, showStage } from './screens.js'
-import { LOGO_POOL }             from '../data/brands.js'
 import { CONFIG }                from '../config.js'
-import { prefersReducedMotion, shuffle } from '../utils/helpers.js'
+import { prefersReducedMotion } from '../utils/helpers.js'
 
 export function runShuffle(q) {
   showStage('shuffle')
@@ -40,30 +39,22 @@ export function runShuffle(q) {
     if (showsImage) {
       slotImg.classList.remove('hidden')
       const targetSrc  = logoUrl(q.correct.domain, CONFIG.logoSize)
-      const cyclePool  = shuffle([...LOGO_POOL]).slice(0, 20).map(c => logoUrl(c.domain, CONFIG.logoSize))
 
-      let count = 0
-      const total = 14
-      const step = () => {
-        if (count >= total) {
-          slotImg.src = targetSrc
-          slotImg.style.filter    = 'none'
-          slotImg.style.transform = 'scale(1.08)'
-          label.textContent = '← Name this brand'
-          setTimeout(() => { slotImg.style.transform = 'scale(1)'; resolve() }, 420)
-          return
-        }
-        slotImg.src          = cyclePool[count % cyclePool.length]
-        slotImg.style.filter = count < 9 ? 'blur(3px) brightness(0.6)' : count < 12 ? 'blur(1px)' : 'none'
-        count++
-        setTimeout(step, 55 + Math.pow(count / total, 2) * 220)
-      }
-      step()
+      slotImg.src = targetSrc
+      slotImg.style.filter = 'blur(3px) brightness(0.72)'
+      slotImg.style.transform = 'scale(0.92)'
+      label.textContent = 'Loading logo...'
+      setTimeout(() => {
+        slotImg.style.filter = 'none'
+        slotImg.style.transform = 'scale(1.08)'
+        label.textContent = '← Name this brand'
+        setTimeout(() => { slotImg.style.transform = 'scale(1)'; resolve() }, 360)
+      }, 500)
 
     } else {
       // Text shuffle (name-to-logo)
       slotText.classList.remove('hidden')
-      const namePool = shuffle([...LOGO_POOL]).map(c => c.name)
+      const namePool = q.options.map(c => c.name)
 
       let count = 0
       const total = 12
