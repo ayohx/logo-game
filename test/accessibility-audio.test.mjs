@@ -39,6 +39,14 @@ test('game waits for question logo assets before starting countdown', () => {
   assert.ok(src.includes('logo-fallback'), 'failed logo loads should show a readable fallback')
 })
 
+test('logo fallback waits long enough and avoids duplicate logo.dev retries', () => {
+  const src = read('src/game/engine.js')
+
+  assert.ok(src.includes('LOGO_LOAD_TIMEOUT_MS'), 'logo load timeout constant missing')
+  assert.ok(src.includes('CONFIG.logoStorageEnabled'), 'storage-off mode should not retry the same logo.dev URL')
+  assert.match(src, /LOGO_LOAD_TIMEOUT_MS\s*=\s*3500/, 'logo load timeout should allow slower mobile connections')
+})
+
 test('speech module marks unsupported voice input for the UI', () => {
   const src = read('src/utils/speech.js')
 

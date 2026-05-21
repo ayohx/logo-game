@@ -10,6 +10,8 @@ import { generateQuestions } from './questions.js'
 import { LOG } from '../utils/logger.js'
 import { startLeaderboardGame, submitLeaderboardScore } from '../utils/leaderboard.js'
 
+const LOGO_LOAD_TIMEOUT_MS = 3500
+
 // ── State ─────────────────────────────────────────────────────────────────────
 const state = {
   pack:       'brands',
@@ -194,9 +196,10 @@ function trackLogoAsset(img, showFallback) {
     let timer = null
     function retryWithLogoDev() {
       if (img.dataset.logoFallbackTried === 'true' || !img.dataset.logoDomain) return false
+      if (!CONFIG.logoStorageEnabled) return false
       img.dataset.logoFallbackTried = 'true'
       window.clearTimeout(timer)
-      timer = window.setTimeout(() => finish(true), 1400)
+      timer = window.setTimeout(() => finish(true), LOGO_LOAD_TIMEOUT_MS)
       img.src = logoFallbackUrl(img.dataset.logoDomain, Number(img.dataset.logoSize) || undefined)
       return true
     }
@@ -209,7 +212,7 @@ function trackLogoAsset(img, showFallback) {
     }
     timer = window.setTimeout(() => {
       if (!retryWithLogoDev()) finish(true)
-    }, 1400)
+    }, LOGO_LOAD_TIMEOUT_MS)
     img.addEventListener('load', () => finish(false), { once: true })
     img.addEventListener('error', () => {
       if (!retryWithLogoDev()) finish(true)
