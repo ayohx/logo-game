@@ -3,10 +3,14 @@ import { CONFIG }     from '../config.js'
 import { LOGO_POOL }  from '../data/brands.js'
 import { shuffle }    from '../utils/helpers.js'
 
-function pickBalancedCorrects(pool, count) {
-  const categories = shuffle([...new Set(pool.map(item => item.cat || 'Other'))])
+function categoryOf(item) {
+  return item.cat || 'Other'
+}
+
+function pickBalancedCorrects(pool, count, shuffleFn) {
+  const categories = shuffleFn([...new Set(pool.map(categoryOf))])
   const buckets = new Map(
-    categories.map(cat => [cat, shuffle(pool.filter(item => (item.cat || 'Other') === cat))])
+    categories.map(cat => [cat, shuffleFn(pool.filter(item => categoryOf(item) === cat))])
   )
 
   const selected = []
@@ -24,50 +28,61 @@ function pickBalancedCorrects(pool, count) {
   }
 
   if (selected.length < count) {
-    const remaining = shuffle(pool.filter(item => !selected.includes(item)))
+    const remaining = shuffleFn(pool.filter(item => !selected.includes(item)))
     selected.push(...remaining.slice(0, count - selected.length))
   }
 
   return selected
 }
 
-function pickDistractors(pool, correct) {
-  const sameCategory = shuffle(
-    pool.filter(item => item.domain !== correct.domain && (item.cat || 'Other') === (correct.cat || 'Other'))
-  )
-  const fallback = shuffle(pool.filter(item => item.domain !== correct.domain))
+function pickDistractors(pool, correct, selectedCorrects, usedDistractors, shuffleFn) {
+  const selectedDomains = new Set(selectedCorrects.map(item => item.domain))
+  const candidates = shuffleFn(pool.filter(item => item.domain !== correct.domain))
   const distractors = []
 
-  if (sameCategory.length) distractors.push(sameCategory[0])
-
-  for (const item of fallback) {
-    if (distractors.length >= 2) break
-    if (item.domain !== correct.domain && !distractors.some(d => d.domain === item.domain)) {
+  function addFrom(matches) {
+    for (const item of candidates) {
+      if (distractors.length >= 2) return
+      if (!matches(item)) continue
+      if (distractors.some(d => d.domain === item.domain)) continue
       distractors.push(item)
     }
   }
 
+  addFrom(item => categoryOf(item) === categoryOf(correct) && !selectedDomains.has(item.domain) && !usedDistractors.has(item.domain))
+  addFrom(item => categoryOf(item) === categoryOf(correct) && !selectedDomains.has(item.domain))
+  addFrom(item => !selectedDomains.has(item.domain) && !usedDistractors.has(item.domain))
+  addFrom(item => !selectedDomains.has(item.domain))
+  addFrom(item => categoryOf(item) === categoryOf(correct))
+  addFrom(() => true)
+
+  distractors.forEach(item => usedDistractors.add(item.domain))
   return distractors.slice(0, 2)
 }
 
-function buildModeBag(count) {
+function buildModeBag(count, shuffleFn) {
   const logoCount = Math.floor(count / 2)
   const nameCount = count - logoCount
-  return shuffle([
+  return shuffleFn([
     ...Array(logoCount).fill('logo-to-name'),
     ...Array(nameCount).fill('name-to-logo'),
   ])
 }
 
-export function generateBrandQuestions() {
-  const pool     = shuffle([...LOGO_POOL])
-  const selected = pickBalancedCorrects(pool, CONFIG.questionsPerGame)
-  const modes    = buildModeBag(CONFIG.questionsPerGame)
+export function buildBrandQuestions(pool, { count = CONFIG.questionsPerGame, shuffleFn = shuffle } = {}) {
+  const selected = pickBalancedCorrects(pool, count, shuffleFn)
+  const modes    = buildModeBag(count, shuffleFn)
+  const usedDistractors = new Set()
 
   return selected.map(correct => {
     const mode    = modes.pop() || 'logo-to-name'
-    const others  = pickDistractors(pool, correct)
-    const options = shuffle([correct, ...others])
+    const others  = pickDistractors(pool, correct, selected, usedDistractors, shuffleFn)
+    const options = shuffleFn([correct, ...others])
     return { pack: 'brands', correct, mode, options, correctIndex: options.indexOf(correct) }
   })
+}
+
+export function generateBrandQuestions() {
+  const pool     = shuffle([...LOGO_POOL])
+  return buildBrandQuestions(pool, { count: CONFIG.questionsPerGame })
 }
