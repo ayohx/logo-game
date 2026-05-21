@@ -84,7 +84,8 @@ body {
 .option-card:focus-visible,
 .pause-btn:focus-visible,
 .vol-btn:focus-visible,
-.pack-card:focus-visible {
+.pack-card:focus-visible,
+.player-entry input:focus-visible {
   outline: 2px solid var(--warning);
   outline-offset: 2px;
 }
@@ -780,8 +781,10 @@ body {
 /* ──────────────────────────────────────────────────────────────────────── */
 
 #screen-history { justify-content: flex-start; padding-top: 20px; overflow-y: auto; }
+#screen-leaderboard { justify-content: flex-start; padding-top: 20px; overflow-y: auto; }
 
-.history-inner {
+.history-inner,
+.leaderboard-inner {
   display: flex;
   flex-direction: column;
   gap: 14px;
@@ -799,6 +802,29 @@ body {
 .history-header h2 { font-size: 1.1rem; font-weight: 700; }
 
 #history-list { display: flex; flex-direction: column; gap: 10px; width: 100%; }
+.leaderboard-list { display: flex; flex-direction: column; gap: 10px; width: 100%; }
+
+.leaderboard-note {
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+
+.leaderboard-row {
+  display: grid;
+  grid-template-columns: 44px 1fr 72px;
+  gap: 10px;
+  align-items: center;
+  padding: 13px 16px;
+  background: var(--card);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-sm);
+}
+
+.leaderboard-rank { color: var(--warning); font-weight: 800; }
+.leaderboard-player { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 700; }
+.leaderboard-score { text-align: right; color: var(--success); font-weight: 800; }
+.leaderboard-meta { grid-column: 2 / 4; color: var(--text-muted); font-size: 0.72rem; }
 
 .history-card {
   background: var(--card);
@@ -857,6 +883,40 @@ details[open] .hs-arrow { transform: rotate(90deg); }
 }
 .empty-icon { font-size: 3rem; margin-bottom: 12px; }
 .empty-sub  { font-size: 0.82rem; margin-top: 6px; color: var(--text-muted); opacity: 0.6; }
+
+.player-entry {
+  width: 100%;
+  max-width: 380px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  text-align: left;
+}
+
+.player-entry label {
+  font-size: 0.76rem;
+  font-weight: 800;
+  color: var(--text-muted);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.player-entry input {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-sm);
+  background: var(--card);
+  color: var(--text);
+  font: inherit;
+}
+
+.name-help,
+.leaderboard-submit-status {
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  line-height: 1.4;
+}
 
 /* ──────────────────────────────────────────────────────────────────────── */
 /*  Pack selector                                                           */

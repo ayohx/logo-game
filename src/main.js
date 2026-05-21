@@ -4,11 +4,45 @@ import { $, showScreen }  from './ui/screens.js'
 import { updateBestScore, initLogoParade, renderResults, renderHistory } from './ui/history.js'
 import { startGame, handleAnswer, pauseGame, resumeGame, getState } from './game/engine.js'
 import { CONFIG }      from './config.js'
+import { fetchLeaderboard, normalisePlayerName } from './utils/leaderboard.js'
 
 // ── Navigation buttons ────────────────────────────────────────────────────────
-$('btn-brands').addEventListener('click',  () => startGame('brands'))
+const playerNameInput = $('player-name')
+const nameHelp = $('name-help')
+
+function getPlayerName() {
+  const playerName = normalisePlayerName(playerNameInput?.value)
+  if (playerNameInput) playerNameInput.value = playerName
+  return playerName
+}
+
+if (playerNameInput) {
+  playerNameInput.value = localStorage.getItem('logoquiz_player_name') || ''
+  playerNameInput.addEventListener('input', () => {
+    if (nameHelp) nameHelp.textContent = 'Your best score will appear once on the shared scoreboard.'
+  })
+}
+
+$('btn-brands').addEventListener('click', async () => {
+  const playerName = getPlayerName()
+  if (playerName.length < 2) {
+    if (nameHelp) nameHelp.textContent = 'Please enter at least 2 letters or numbers before playing.'
+    playerNameInput?.focus()
+    return
+  }
+
+  localStorage.setItem('logoquiz_player_name', playerName)
+  if (nameHelp) nameHelp.textContent = 'Starting shared game...'
+
+  try {
+    await startGame('brands', playerName)
+  } catch (error) {
+    if (nameHelp) nameHelp.textContent = error instanceof Error ? error.message : 'Could not start the shared game.'
+  }
+})
 
 $('btn-history').addEventListener('click', () => renderHistory())
+$('btn-leaderboard').addEventListener('click', () => renderLeaderboard())
 
 $('btn-play-again').addEventListener('click', () => {
   const { pack } = getState()
@@ -37,6 +71,36 @@ $('btn-history-back').addEventListener('click', () => {
     updateBestScore()
   }
 })
+
+$('btn-leaderboard-back').addEventListener('click', () => {
+  showScreen('start')
+  updateBestScore()
+})
+
+async function renderLeaderboard() {
+  const list = $('leaderboard-list')
+  showScreen('leaderboard')
+  list.innerHTML = '<div class="empty-history"><p>Loading shared scores...</p></div>'
+
+  try {
+    const { leaderboard } = await fetchLeaderboard()
+    if (!leaderboard.length) {
+      list.innerHTML = '<div class="empty-history"><p>No shared scores yet.</p><p class="empty-sub">Play the first round to claim the board.</p></div>'
+      return
+    }
+
+    list.innerHTML = leaderboard.map(row => `
+      <div class="leaderboard-row">
+        <span class="leaderboard-rank">#${row.rank}</span>
+        <span class="leaderboard-player">${row.playerName}</span>
+        <span class="leaderboard-score">${row.bestScore} pts</span>
+        <span class="leaderboard-meta">${row.bestCorrect}/10 · streak ${row.bestStreak} · ${row.gamesPlayed} game${row.gamesPlayed === 1 ? '' : 's'}</span>
+      </div>
+    `).join('')
+  } catch (error) {
+    list.innerHTML = `<div class="empty-history"><p>${error instanceof Error ? error.message : 'Could not load leaderboard.'}</p></div>`
+  }
+}
 
 // ── Pause button ──────────────────────────────────────────────────────────────
 $('btn-pause').addEventListener('click', () => {

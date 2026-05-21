@@ -8,6 +8,7 @@ import { saveToHistory, renderResults } from '../ui/history.js'
 import { startTimer, stopTimer, pauseTimer, resumeTimer, getTimerStart } from './timer.js'
 import { generateBrandQuestions } from './questions.js'
 import { LOG } from '../utils/logger.js'
+import { startLeaderboardGame, submitLeaderboardScore } from '../utils/leaderboard.js'
 
 // ── State ─────────────────────────────────────────────────────────────────────
 const state = {
@@ -19,20 +20,27 @@ const state = {
   answering:  false,
   paused:     false,
   currentQ:   null,
+  sessionId:  null,
+  playerName: '',
+  leaderboardResult: null,
 }
 
 export function getState() { return state }
 
 // ── Game lifecycle ────────────────────────────────────────────────────────────
-export async function startGame(pack) {
+export async function startGame(pack, playerName = '') {
   AUDIO.resume()
+  const leaderboardSession = await startLeaderboardGame(playerName)
   state.pack      = pack || 'brands'
   state.current   = 0
   state.score     = 0
   state.answers   = []
   state.paused    = false
   state.currentQ  = null
-  state.questions = generateBrandQuestions()
+  state.sessionId = leaderboardSession.sessionId
+  state.playerName = leaderboardSession.playerName
+  state.leaderboardResult = null
+  state.questions = leaderboardSession.questions || generateBrandQuestions()
 
   LOG.event('game_start', { pack: state.pack, questions: state.questions.length })
   LOG.startSession(state.pack)
@@ -237,11 +245,35 @@ function revealAnswer(q, chosenIdx, points, secsUsed) {
 }
 
 // ── End game ──────────────────────────────────────────────────────────────────
-function endGame() {
+async function endGame() {
   LOG.event('game_end', { score: state.score, pack: state.pack, totalQuestions: state.answers.length })
   LOG.endSession(state.score)
   AUDIO.end(state.score)
   saveToHistory(state.score, state.pack, state.answers)
   renderResults(state.answers, state.score)
   showScreen('results')
+  submitSharedScore()
+}
+
+async function submitSharedScore() {
+  const status = $('leaderboard-submit-status')
+  if (!state.sessionId) return
+
+  if (status) status.textContent = 'Submitting to shared leaderboard...'
+
+  try {
+    const answerLog = state.answers.map(answer => ({
+      choiceDomain: answer.chosen?.domain || null,
+      timeUsed: answer.timeUsed,
+      timedOut: answer.timedOut,
+    }))
+    state.leaderboardResult = await submitLeaderboardScore(state.sessionId, answerLog)
+    if (status) {
+      status.textContent = state.leaderboardResult.improved
+        ? `Shared leaderboard updated. Your retained best is ${state.leaderboardResult.retainedBest} pts.`
+        : `Score submitted. Your retained best remains ${state.leaderboardResult.retainedBest} pts.`
+    }
+  } catch (error) {
+    if (status) status.textContent = error instanceof Error ? error.message : 'Could not submit score.'
+  }
 }

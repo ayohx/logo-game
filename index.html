@@ -23,6 +23,12 @@
 
       <div id="best-score" class="best-score"></div>
 
+      <div class="player-entry">
+        <label for="player-name">Player name</label>
+        <input id="player-name" name="player-name" type="text" maxlength="24" autocomplete="nickname" placeholder="Enter your name" />
+        <p id="name-help" class="name-help">Your best score will appear once on the shared scoreboard.</p>
+      </div>
+
       <!-- Pack selector -->
       <div class="pack-selector">
         <button class="pack-card" id="btn-brands">
@@ -33,6 +39,7 @@
       </div>
 
       <button class="btn btn-ghost btn-sm" id="btn-history">View History</button>
+      <button class="btn btn-ghost btn-sm" id="btn-leaderboard">Shared Leaderboard</button>
 
       <div class="input-hints">
         <span>🖱 Click</span>
@@ -146,6 +153,7 @@
       <div class="final-score" id="final-score"></div>
       <p class="final-label">out of 50 points</p>
       <p class="result-message" id="result-message"></p>
+      <p class="leaderboard-submit-status" id="leaderboard-submit-status" aria-live="polite"></p>
       <div class="result-stats" id="result-stats"></div>
       <div class="breakdown" id="breakdown"></div>
       <div class="results-actions">
@@ -165,6 +173,18 @@
         <button class="btn btn-ghost btn-sm" id="btn-history-back">← Back</button>
       </div>
       <div id="history-list"></div>
+    </div>
+  </div>
+
+  <!-- ───────────────────────── LEADERBOARD SCREEN ─────────────────────── -->
+  <div id="screen-leaderboard" class="screen">
+    <div class="leaderboard-inner">
+      <div class="history-header">
+        <h2>Shared Leaderboard</h2>
+        <button class="btn btn-ghost btn-sm" id="btn-leaderboard-back">← Back</button>
+      </div>
+      <p class="leaderboard-note">One best score per player name. Your lower later scores will not replace your best.</p>
+      <div id="leaderboard-list" class="leaderboard-list"></div>
     </div>
   </div>
 
