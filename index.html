@@ -27,24 +27,32 @@
         <label for="player-name">Profile name</label>
         <input id="player-name" name="player-name" type="text" maxlength="24" autocomplete="nickname" placeholder="Enter your name" />
         <div class="avatar-entry">
-          <select id="avatar-type" aria-label="Avatar type">
-            <option value="initials">Initials</option>
-            <option value="emoji">Emoji</option>
-          </select>
+          <input id="avatar-type" type="hidden" value="initials" />
           <input id="profile-avatar" name="profile-avatar" type="text" maxlength="8" aria-label="Profile avatar" placeholder="AO" />
           <button class="btn btn-ghost btn-sm" id="btn-save-profile" type="button">Save profile</button>
+        </div>
+        <div class="avatar-presets" id="avatar-presets" aria-label="Choose an avatar">
+          <button type="button" class="avatar-choice is-active" data-avatar-type="initials" data-avatar-value="">Initials</button>
+          <button type="button" class="avatar-choice" data-avatar-type="emoji" data-avatar-value="😀">😀</button>
+          <button type="button" class="avatar-choice" data-avatar-type="emoji" data-avatar-value="🔥">🔥</button>
+          <button type="button" class="avatar-choice" data-avatar-type="emoji" data-avatar-value="🚀">🚀</button>
+          <button type="button" class="avatar-choice" data-avatar-type="emoji" data-avatar-value="🏆">🏆</button>
+          <button type="button" class="avatar-choice" data-avatar-type="emoji" data-avatar-value="🧠">🧠</button>
+          <button type="button" class="avatar-choice" data-avatar-type="emoji" data-avatar-value="⭐">⭐</button>
         </div>
         <p id="name-help" class="name-help">Your best score will appear once on the shared scoreboard.</p>
       </div>
 
       <!-- Pack selector -->
       <div class="pack-selector">
-        <button class="pack-card" id="btn-brands">
+        <button class="pack-card is-selected" id="btn-brands" type="button" aria-pressed="true">
           <span class="pack-icon">🌍</span>
           <span class="pack-name">Mix Brands</span>
           <span class="pack-desc">Logos from global &amp; UK favourites — tech, food, fashion &amp; more</span>
         </button>
       </div>
+      <p class="selected-pack" id="selected-pack">Mix Brands is selected. Enter your profile, then start the game.</p>
+      <button class="btn btn-primary btn-xl" id="btn-start-game" type="button">Start Game</button>
 
       <button class="btn btn-ghost btn-sm" id="btn-history">View History</button>
       <button class="btn btn-ghost btn-sm" id="btn-leaderboard">Shared Leaderboard</button>
@@ -200,6 +208,6 @@
 
 </div>
 <!-- Single ES-module entry point — no globals, no load-order dependencies -->
-<script type="module" src="src/main.js"></script>
+<script type="module" src="src/main.js?v=20260521-profile-fix"></script>
 </body>
 </html>

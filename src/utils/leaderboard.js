@@ -2,6 +2,7 @@
 const FUNCTION_BASE = 'https://xbcwbzsgvmerkbnnplep.supabase.co/functions/v1'
 const PLAYER_ID_KEY = 'logoquiz_player_id'
 const PROFILE_KEY = 'logoquiz_player_profile'
+const PLAYER_ID_PATTERN = /^[a-z0-9_-]{8,64}$/
 
 async function callFunction(name, options = {}) {
   const res = await fetch(`${FUNCTION_BASE}/${name}`, {
@@ -13,7 +14,13 @@ async function callFunction(name, options = {}) {
   })
 
   const data = await res.json().catch(() => ({}))
-  if (!res.ok) throw new Error(data.error || 'Leaderboard request failed')
+  if (!res.ok) {
+    const message = data.error || 'Leaderboard request failed'
+    if (/already taken|duplicate key|unique constraint/i.test(message)) {
+      throw new Error('That profile name is already taken. Please add an initial or choose another name.')
+    }
+    throw new Error(message)
+  }
   return data
 }
 
@@ -23,11 +30,13 @@ export function normalisePlayerName(name) {
 
 function makePlayerId() {
   const existing = localStorage.getItem(PLAYER_ID_KEY)
-  if (existing) return existing
+  if (existing && PLAYER_ID_PATTERN.test(existing)) return existing
 
-  const bytes = new Uint8Array(10)
-  crypto.getRandomValues(bytes)
-  const id = Array.from(bytes, byte => byte.toString(36).padStart(2, '0')).join('').slice(0, 18)
+  if (existing) localStorage.removeItem(PLAYER_ID_KEY)
+
+  const id = crypto.randomUUID
+    ? crypto.randomUUID()
+    : `player_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 10)}`
   localStorage.setItem(PLAYER_ID_KEY, id)
   return id
 }
@@ -37,7 +46,12 @@ function initialsFor(name) {
 }
 
 export function getPlayerProfile() {
-  const stored = JSON.parse(localStorage.getItem(PROFILE_KEY) || '{}')
+  let stored = {}
+  try {
+    stored = JSON.parse(localStorage.getItem(PROFILE_KEY) || '{}')
+  } catch {
+    localStorage.removeItem(PROFILE_KEY)
+  }
   const displayName = normalisePlayerName(stored.displayName || localStorage.getItem('logoquiz_player_name') || '')
   const avatarType = stored.avatarType === 'emoji' ? 'emoji' : 'initials'
   const avatarValue = String(stored.avatarValue || initialsFor(displayName)).trim().slice(0, 8) || '??'
@@ -50,11 +64,21 @@ export function getPlayerProfile() {
   }
 }
 
+function normaliseProfileInput(input) {
+  if (typeof input === 'string') {
+    return { ...getPlayerProfile(), displayName: input }
+  }
+
+  return { ...getPlayerProfile(), ...(input || {}) }
+}
+
 export function saveProfileLocally(profile) {
-  const displayName = normalisePlayerName(profile.displayName)
-  const avatarType = profile.avatarType === 'emoji' ? 'emoji' : 'initials'
-  const avatarValue = String(profile.avatarValue || initialsFor(displayName)).trim().slice(0, 8) || initialsFor(displayName)
-  const saved = { playerId: makePlayerId(), displayName, avatarType, avatarValue }
+  const input = normaliseProfileInput(profile)
+  const displayName = normalisePlayerName(input.displayName)
+  const avatarType = input.avatarType === 'emoji' ? 'emoji' : 'initials'
+  const avatarValue = String(input.avatarValue || initialsFor(displayName)).trim().slice(0, 8) || initialsFor(displayName)
+  const playerId = PLAYER_ID_PATTERN.test(input.playerId || '') ? input.playerId : makePlayerId()
+  const saved = { playerId, displayName, avatarType, avatarValue }
   localStorage.setItem('logoquiz_player_name', displayName)
   localStorage.setItem(PROFILE_KEY, JSON.stringify(saved))
   return saved

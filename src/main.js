@@ -25,19 +25,30 @@ function syncProfileForm() {
   if (playerNameInput) playerNameInput.value = activeProfile.displayName
   if (avatarTypeInput) avatarTypeInput.value = activeProfile.avatarType
   if (profileAvatarInput) profileAvatarInput.value = activeProfile.avatarValue
+  syncAvatarChoices(activeProfile)
 }
 
 syncProfileForm()
 
 playerNameInput?.addEventListener('input', () => {
+  if (avatarTypeInput?.value === 'initials' && profileAvatarInput) {
+    profileAvatarInput.value = playerNameInput.value.replace(/[^A-Za-z0-9]/g, '').slice(0, 2).toUpperCase()
+  }
   if (nameHelp) nameHelp.textContent = 'Your best score will appear once on the shared scoreboard.'
 })
 
-avatarTypeInput?.addEventListener('change', () => {
-  const profile = getProfileFromForm()
-  if (profileAvatarInput && profile.avatarType === 'initials' && !profileAvatarInput.value.trim()) {
-    profileAvatarInput.value = profile.displayName.replace(/[^A-Za-z0-9]/g, '').slice(0, 2).toUpperCase()
-  }
+document.querySelectorAll('.avatar-choice').forEach(button => {
+  button.addEventListener('click', () => {
+    const avatarType = button.dataset.avatarType === 'emoji' ? 'emoji' : 'initials'
+    const avatarValue = avatarType === 'emoji'
+      ? button.dataset.avatarValue
+      : playerNameInput.value.replace(/[^A-Za-z0-9]/g, '').slice(0, 2).toUpperCase()
+
+    if (avatarTypeInput) avatarTypeInput.value = avatarType
+    if (profileAvatarInput) profileAvatarInput.value = avatarValue || '??'
+    activeProfile = getProfileFromForm()
+    syncAvatarChoices(activeProfile)
+  })
 })
 
 $('btn-save-profile').addEventListener('click', async () => {
@@ -50,7 +61,14 @@ $('btn-save-profile').addEventListener('click', async () => {
   }
 })
 
-$('btn-brands').addEventListener('click', async () => {
+$('btn-brands').addEventListener('click', () => {
+  $('selected-pack').textContent = 'Mix Brands is selected. Press Start Game when you are ready.'
+  $('btn-start-game').focus()
+})
+
+$('btn-start-game').addEventListener('click', () => startSelectedGame())
+
+async function startSelectedGame() {
   const profile = getProfileFromForm()
   if (profile.displayName.length < 2) {
     if (nameHelp) nameHelp.textContent = 'Please enter at least 2 letters or numbers before playing.'
@@ -66,7 +84,16 @@ $('btn-brands').addEventListener('click', async () => {
   } catch (error) {
     if (nameHelp) nameHelp.textContent = error instanceof Error ? error.message : 'Could not start the shared game.'
   }
-})
+}
+
+function syncAvatarChoices(profile) {
+  document.querySelectorAll('.avatar-choice').forEach(button => {
+    const isActive = button.dataset.avatarType === profile.avatarType &&
+      (profile.avatarType === 'initials' || button.dataset.avatarValue === profile.avatarValue)
+    button.classList.toggle('is-active', isActive)
+    button.setAttribute('aria-pressed', String(isActive))
+  })
+}
 
 $('btn-history').addEventListener('click', () => renderHistory())
 $('btn-leaderboard').addEventListener('click', () => renderLeaderboard())
