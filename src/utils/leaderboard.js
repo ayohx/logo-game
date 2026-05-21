@@ -79,6 +79,7 @@ export function saveProfileLocally(profile) {
   const avatarValue = String(input.avatarValue || initialsFor(displayName)).trim().slice(0, 8) || initialsFor(displayName)
   const playerId = PLAYER_ID_PATTERN.test(input.playerId || '') ? input.playerId : makePlayerId()
   const saved = { playerId, displayName, avatarType, avatarValue }
+  localStorage.setItem(PLAYER_ID_KEY, playerId)
   localStorage.setItem('logoquiz_player_name', displayName)
   localStorage.setItem(PROFILE_KEY, JSON.stringify(saved))
   return saved

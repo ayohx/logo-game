@@ -25,6 +25,7 @@ test('leaderboard client upgrades legacy name-only start calls', () => {
   assert.ok(src.includes('typeof input === \'string\''), 'legacy name-only profile input is not handled')
   assert.ok(src.includes('normaliseProfileInput'), 'profile input normalisation missing')
   assert.ok(src.includes('localStorage.removeItem(PLAYER_ID_KEY)'), 'invalid stored player id is not repaired')
+  assert.ok(src.includes('localStorage.setItem(PLAYER_ID_KEY, playerId)'), 'saved profile id must stay aligned with stored player id')
 })
 
 test('start screen has profile name and avatar editing controls', () => {
