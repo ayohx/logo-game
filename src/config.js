@@ -8,4 +8,5 @@ export const CONFIG = {
   logoSize:          160,     // px for main prompt logo
   optLogoSize:        80,     // px for option logos
   maxHistory:         20,     // games to keep in localStorage
+  logoStorageEnabled: false,   // switch on only after Supabase Storage upload is verified
 }

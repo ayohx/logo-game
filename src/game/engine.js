@@ -2,7 +2,7 @@
 import { CONFIG }    from '../config.js'
 import { AUDIO }     from '../utils/audio.js'
 import { SPEECH }    from '../utils/speech.js'
-import { $, logoUrl, showScreen, showStage, showScorePop, updateHUD } from '../ui/screens.js'
+import { $, logoUrl, logoFallbackUrl, showScreen, showStage, showScorePop, updateHUD } from '../ui/screens.js'
 import { runShuffle }         from '../ui/shuffle.js'
 import { saveToHistory, renderResults } from '../ui/history.js'
 import { startTimer, stopTimer, pauseTimer, resumeTimer, getTimerStart } from './timer.js'
@@ -107,6 +107,8 @@ async function showQuestion(q) {
     const img = document.createElement('img')
     img.className = 'prompt-logo'
     img.alt       = 'Brand logo'
+    img.dataset.logoDomain = q.correct.domain
+    img.dataset.logoSize = String(CONFIG.logoSize)
     const src     = logoUrl(q.correct.domain, CONFIG.logoSize)
     img.onload    = () => { LOG.event('img_load_ok',   { src }); LOG.logImgResult(q.correct.domain, true,  src) }
     img.onerror   = () => { LOG.event('img_load_fail', { src, domain: q.correct.domain }); LOG.logImgResult(q.correct.domain, false, src) }
@@ -145,6 +147,8 @@ async function showQuestion(q) {
       optImg.src      = optSrc
       optImg.alt      = opt.name
       optImg.className = 'opt-logo'
+      optImg.dataset.logoDomain = opt.domain
+      optImg.dataset.logoSize = String(CONFIG.optLogoSize)
       optImg.onload  = () => { LOG.event('img_load_ok',   { src: optSrc }); LOG.logImgResult(opt.domain, true,  optSrc) }
       optImg.onerror = () => { LOG.event('img_load_fail', { src: optSrc, domain: opt.domain }); LOG.logImgResult(opt.domain, false, optSrc) }
 
@@ -187,6 +191,15 @@ async function showQuestion(q) {
 function trackLogoAsset(img, showFallback) {
   return new Promise(resolve => {
     let settled = false
+    let timer = null
+    function retryWithLogoDev() {
+      if (img.dataset.logoFallbackTried === 'true' || !img.dataset.logoDomain) return false
+      img.dataset.logoFallbackTried = 'true'
+      window.clearTimeout(timer)
+      timer = window.setTimeout(() => finish(true), 1400)
+      img.src = logoFallbackUrl(img.dataset.logoDomain, Number(img.dataset.logoSize) || undefined)
+      return true
+    }
     function finish(failed) {
       if (settled) return
       settled = true
@@ -194,9 +207,13 @@ function trackLogoAsset(img, showFallback) {
       if (failed) showFallback()
       resolve()
     }
-    const timer = window.setTimeout(() => finish(true), 1400)
+    timer = window.setTimeout(() => {
+      if (!retryWithLogoDev()) finish(true)
+    }, 1400)
     img.addEventListener('load', () => finish(false), { once: true })
-    img.addEventListener('error', () => finish(true), { once: true })
+    img.addEventListener('error', () => {
+      if (!retryWithLogoDev()) finish(true)
+    })
   })
 }
 

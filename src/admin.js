@@ -77,6 +77,19 @@ const tabConfig = {
       ['common_wrong_choice', 'Common wrong choice'],
     ],
   },
+  logoHealth: {
+    title: 'Logo Health',
+    summary: 'Supabase Storage coverage and verification status for each logo asset.',
+    sortBy: 'status',
+    columns: [
+      ['name', 'Logo'],
+      ['domain', 'Domain'],
+      ['packs', 'Packs'],
+      ['status', 'Status'],
+      ['byte_size', 'Size'],
+      ['verified_at', 'Verified'],
+    ],
+  },
 }
 
 async function fetchAdminAnalytics(password, overrides = {}) {
@@ -162,8 +175,10 @@ function formatCell(key, row) {
   if (key === 'duration_seconds' || key === 'total_duration_seconds') return formatDuration(row[key])
   if (key === 'avg_time' || key === 'avg_answer_time') return formatAnswerTime(row[key])
   if (key === 'wrong_rate' || key === 'timeout_rate') return formatPercent(row[key])
-  if (key === 'submitted_at' || key === 'last_played_at' || key === 'best_submitted_at') return formatDate(row[key])
+  if (key === 'submitted_at' || key === 'last_played_at' || key === 'best_submitted_at' || key === 'verified_at') return formatDate(row[key])
   if (key === 'common_wrong_choice') return row[key] || 'None yet'
+  if (key === 'packs') return Array.isArray(row[key]) ? row[key].map(formatPack).join(', ') : formatPack(row[key])
+  if (key === 'byte_size') return `${Math.round((Number(row[key]) || 0) / 1024)} KB`
   return row[key] ?? 0
 }
 

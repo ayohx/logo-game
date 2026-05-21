@@ -1,5 +1,5 @@
 // ── History & Results rendering ───────────────────────────────────────────────
-import { $, logoUrl, showScreen } from './screens.js'
+import { $, logoUrl, logoFallbackUrl, showScreen } from './screens.js'
 import { CONFIG }                 from '../config.js'
 import { getPackPool }            from '../game/questions.js'
 import { getRank, shuffle }       from '../utils/helpers.js'
@@ -32,7 +32,7 @@ export function initLogoParade(pack = 'brands') {
   const parade = $('logo-parade')
   const sample = shuffle([...getPackPool(pack)]).slice(0, 6)
   parade.innerHTML = sample.map(l =>
-    `<div class="parade-item"><img src="${logoUrl(l.domain, 56)}" alt="${l.name}" loading="lazy" /></div>`
+    `<div class="parade-item"><img src="${logoUrl(l.domain, 56)}" alt="${l.name}" loading="lazy" onerror="this.onerror=null;this.src='${logoFallbackUrl(l.domain, 56)}'" /></div>`
   ).join('')
 }
 
@@ -76,6 +76,7 @@ export function renderResults(answers, score) {
     const label  = a.logo?.name || '?'
     const chosen = a.timedOut ? 'No answer' : a.chosen?.name || 'Unknown'
     const imgSrc = logoUrl(a.logo?.domain, 28)
+    const fallbackSrc = logoFallbackUrl(a.logo?.domain, 28)
     const modeLbl = {
       'logo-to-name':  '🏷️',
       'name-to-logo':  '🖼️',
@@ -84,7 +85,7 @@ export function renderResults(answers, score) {
     return `
       <div class="br-row ${a.correct ? 'br-correct' : 'br-wrong'}">
         <span class="br-num">Q${i + 1}</span>
-        <img src="${imgSrc}" class="br-logo" alt="${label}" />
+        <img src="${imgSrc}" class="br-logo" alt="${label}" onerror="this.onerror=null;this.src='${fallbackSrc}'" />
         <span class="br-detail">
           <span class="br-name">${label}</span>
           <span class="br-answer">You: ${chosen}</span>

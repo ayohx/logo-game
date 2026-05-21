@@ -29,6 +29,7 @@ test('admin page has tabbed analytics sections and table controls', () => {
     'admin-tab-players',
     'admin-tab-leaderboard',
     'admin-tab-questions',
+    'admin-tab-logo-health',
     'admin-pack-filter',
     'admin-search',
     'admin-page-size',
@@ -55,6 +56,7 @@ test('admin client supports paged, sorted, filtered tab data', () => {
   assert.ok(src.includes('admin-search'), 'search wiring missing')
   assert.ok(src.includes('renderPagination'), 'pagination rendering missing')
   assert.ok(src.includes('questionInsights'), 'question insights tab missing')
+  assert.ok(src.includes('logoHealth'), 'logo health tab missing')
 })
 
 test('admin styles include dashboard table and stats layouts', () => {

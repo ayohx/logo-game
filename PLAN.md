@@ -19,7 +19,8 @@ This document merges the original improvement plan, the leaderboard/profile/admi
 - The shared leaderboard, editable profiles, admin page, and Travel & Adventure pack are complete and pushed.
 - There are local fixes for logo loading reliability and mobile avatar layout that are tested but not committed or pushed.
 - The admin analytics redesign is now implemented and deployed to Supabase, with frontend changes ready to push.
-- The next major workstream after this push is Supabase Storage for all current logo assets.
+- The Supabase Storage bucket, registry table, and local sync script are now in place.
+- Logo Storage runtime support is code-ready but intentionally disabled until the logo upload is completed with a Supabase service-role key.
 
 ## Done And Pushed
 
@@ -165,13 +166,13 @@ Goal: make `/admin.html` useful as the game grows, without dumping everything in
   - Slowest answered logos
   - Most common wrong choices
 
-## Following Workstream: Supabase Logo Storage
+## Active Workstream: Supabase Logo Storage
 
 Goal: stop relying on live logo.dev requests during gameplay and serve verified assets from Supabase Storage.
 
 ### Storage
 
-- [ ] Create public Supabase Storage bucket.
+- [x] Create public Supabase Storage bucket.
   - Proposed bucket: `logo-game-logos`
 - [ ] Store versioned assets.
   - Example paths:
@@ -183,31 +184,35 @@ Goal: stop relying on live logo.dev requests during gameplay and serve verified 
 
 ### Metadata
 
-- [ ] Add `logo_game.logo_assets` table.
+- [x] Add `logo_game.logo_assets` table.
   - Fields: domain, name, pack, category, storage path, public URL, source URL, status, content type, content hash, verified date, updated date.
-- [ ] Track status:
+- [x] Track status:
   - `verified`
   - `missing`
   - `needs_review`
 
 ### Migration Script
 
-- [ ] Add local script to sync logos.
+- [x] Add local script to sync logos.
   - Proposed path: `scripts/sync-logo-assets.mjs`
-- [ ] Read `src/data/brands.js` and `src/data/travel.js`.
-- [ ] Deduplicate all current General and Travel domains.
-- [ ] Download each logo from logo.dev once.
-- [ ] Validate image responses.
-- [ ] Save a review manifest.
+- [x] Read `src/data/brands.js` and `src/data/travel.js`.
+- [x] Deduplicate all current General and Travel domains.
+- [x] Download each logo from logo.dev once.
+- [x] Validate image responses.
+- [x] Save a review manifest.
 - [ ] Upload verified files to Supabase Storage.
+  - Blocked in this environment because `SUPABASE_SERVICE_ROLE_KEY` is not available.
 - [ ] Upsert `logo_game.logo_assets`.
-- [ ] Use environment variables only for credentials.
+  - Script support exists; full upsert depends on the upload credential.
+- [x] Use environment variables only for credentials.
 
 ### Runtime
 
-- [ ] Change `logoUrl()` in `src/ui/screens.js` to prefer Supabase Storage.
-- [ ] Keep readable fallback if a stored logo fails.
-- [ ] Add Logo Health metrics to admin.
+- [x] Add Supabase Storage URL helpers in `src/ui/screens.js`.
+- [x] Keep `logoStorageEnabled: false` until upload is verified, so live UX does not slow down on empty storage.
+- [x] Keep readable fallback if a stored logo fails.
+- [x] Add Logo Health tab to admin.
+  - It reads `logo_game.logo_assets` and will populate after the upload script runs with `SUPABASE_SERVICE_ROLE_KEY`.
 
 ## Future Expansion Ideas
 

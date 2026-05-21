@@ -1,12 +1,27 @@
 // ── Screen management + DOM helpers ──────────────────────────────────────────
 import { CONFIG } from '../config.js'
 
+export const LOGO_ASSET_VERSION = 'v1'
+export const LOGO_STORAGE_BASE = 'https://xbcwbzsgvmerkbnnplep.supabase.co/storage/v1/object/public/logo-game-logos'
+
 export function $(id) {
   return document.getElementById(id)
 }
 
-export function logoUrl(domain, size) {
+export function logoStorageUrl(domain) {
+  return `${LOGO_STORAGE_BASE}/${LOGO_ASSET_VERSION}/${domain}.png`
+}
+
+export function logoDevUrl(domain, size) {
   return `https://img.logo.dev/${domain}?token=${CONFIG.token}&size=${size ?? CONFIG.logoSize}&format=png`
+}
+
+export function logoFallbackUrl(domain, size) {
+  return logoDevUrl(domain, size)
+}
+
+export function logoUrl(domain, size) {
+  return CONFIG.logoStorageEnabled ? logoStorageUrl(domain) : logoDevUrl(domain, size)
 }
 
 export function showScreen(id) {
