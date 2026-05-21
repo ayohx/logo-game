@@ -222,6 +222,7 @@ function revealAnswer(q, chosenIdx, points, secsUsed) {
     timedOut:     chosenIdx === -1,
     mode:         q.mode,
     logo:         q.correct,
+    chosen:       chosenIdx >= 0 ? q.options[chosenIdx] : null,
   })
 
   updateHUD(state.current, state.score, CONFIG.questionsPerGame)

@@ -36,6 +36,20 @@ export function initLogoParade() {
   ).join('')
 }
 
+export function getBestStreak(answers) {
+  return answers.reduce((best, answer) => {
+    const current = answer.correct ? best.current + 1 : 0
+    return { current, longest: Math.max(best.longest, current) }
+  }, { current: 0, longest: 0 }).longest
+}
+
+function getResultMessage(score, correctCount) {
+  if (score >= 45) return 'Outstanding round. You recognised the brands quickly and consistently.'
+  if (correctCount >= 8) return 'Strong brand knowledge. A little more speed will push your score higher.'
+  if (correctCount >= 5) return 'Good effort. Review the missed logos below and try to beat this run.'
+  return 'Keep practising. The review below shows which logos to watch for next time.'
+}
+
 export function renderResults(answers, score) {
   const rank = getRank(score)
   $('rank-badge').innerHTML    = `${rank.emoji} ${rank.label}`
@@ -45,15 +59,22 @@ export function renderResults(answers, score) {
   const correctCount = answers.filter(a => a.correct).length
   const avgTime      = (answers.reduce((s, a) => s + a.timeUsed, 0) / answers.length).toFixed(1)
   const fastestTime  = Math.min(...answers.map(a => a.timeUsed)).toFixed(1)
+  const accuracy     = Math.round((correctCount / answers.length) * 100)
+  const bestStreak   = getBestStreak(answers)
+
+  $('result-message').textContent = getResultMessage(score, correctCount)
 
   $('result-stats').innerHTML = `
     <span>${correctCount}/${CONFIG.questionsPerGame} correct</span>
+    <span>Accuracy ${accuracy}%</span>
+    <span>Best streak ${bestStreak}</span>
     <span>Avg ${avgTime}s per answer</span>
     <span>Fastest ${fastestTime}s</span>
   `
 
   $('breakdown').innerHTML = answers.map((a, i) => {
     const label  = a.logo?.name || '?'
+    const chosen = a.timedOut ? 'No answer' : a.chosen?.name || 'Unknown'
     const imgSrc = logoUrl(a.logo?.domain, 28)
     const modeLbl = {
       'logo-to-name':  '🏷️',
@@ -64,7 +85,10 @@ export function renderResults(answers, score) {
       <div class="br-row ${a.correct ? 'br-correct' : 'br-wrong'}">
         <span class="br-num">Q${i + 1}</span>
         <img src="${imgSrc}" class="br-logo" alt="${label}" />
-        <span class="br-name">${label}</span>
+        <span class="br-detail">
+          <span class="br-name">${label}</span>
+          <span class="br-answer">You: ${chosen}</span>
+        </span>
         <span class="br-mode">${modeLbl}</span>
         <span class="br-time">${a.timedOut ? 'timeout' : `${a.timeUsed.toFixed(1)}s`}</span>
         <span class="br-pts">${a.correct ? `<strong>+${a.pointsEarned}</strong>` : '—'}</span>
