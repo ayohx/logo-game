@@ -38,6 +38,9 @@ test('engine starts from server-issued questions and submits answer log', () => 
   assert.ok(src.includes('startLeaderboardGame'), 'server start call missing')
   assert.ok(src.includes('submitLeaderboardScore'), 'server submit call missing')
   assert.ok(src.includes('choiceDomain'), 'submit answer log should include chosen option domain')
+  assert.ok(src.includes('choiceName'), 'submit answer log should include chosen option name for admin analytics')
+  assert.ok(src.includes('correctDomain'), 'submit answer log should include correct domain for admin analytics')
+  assert.ok(src.includes('pointsEarned'), 'submit answer log should include points earned per question')
 })
 
 test('main wires player-name start and leaderboard navigation', () => {

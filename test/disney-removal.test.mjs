@@ -34,6 +34,20 @@ test('src/data/disney.js does not exist', () => {
   assert.ok(!exists('src/data/disney.js'), 'src/data/disney.js should be deleted')
 })
 
+test('legacy root runtime files do not exist', () => {
+  ;[
+    'audio.js',
+    'config.js',
+    'disney.js',
+    'game.js',
+    'logos.js',
+    'speech.js',
+    'logo-game-refactor.bundle',
+  ].forEach(file => {
+    assert.ok(!exists(file), `${file} should not exist at the project root`)
+  })
+})
+
 test('src/game/questions.js does not export generateDisneyQuestions', () => {
   const src = read('src/game/questions.js')
   assert.ok(!src.includes('generateDisneyQuestions'), 'generateDisneyQuestions should be removed from questions.js')

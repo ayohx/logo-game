@@ -98,3 +98,10 @@ test('start screen uses mobile-safe responsive layout rules', () => {
   assert.match(css, /#screen-game\s*\{[^}]*overflow:\s*hidden/s, 'gameplay screen must remain non-scrollable')
   assert.match(css, /\.question-stage\s*\{[^}]*overflow:\s*hidden/s, 'question stage should fit without scrolling')
 })
+
+test('avatar emoji presets stay on one mobile row', () => {
+  const css = read('style.css')
+
+  assert.match(css, /\.avatar-presets\s*\{[^}]*flex-wrap:\s*nowrap/s, 'avatar choices should stay on one line')
+  assert.match(css, /\.avatar-choice\s*\{[^}]*min-width:\s*32px/s, 'avatar buttons should be compact enough for mobile')
+})

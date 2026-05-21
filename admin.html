@@ -33,23 +33,50 @@
 
       <div class="admin-stats" id="admin-stats"></div>
 
-      <div class="admin-grid">
-        <section class="admin-card">
-          <h2>Player Summary</h2>
-          <div id="admin-player-stats" class="admin-table-wrap"></div>
-        </section>
-        <section class="admin-card">
-          <h2>Recent Plays</h2>
-          <div id="admin-recent-plays" class="admin-table-wrap"></div>
-        </section>
+      <div class="admin-controls">
+        <label>
+          Pack
+          <select id="admin-pack-filter">
+            <option value="all">All packs</option>
+            <option value="brands">Mix Brands</option>
+            <option value="travel">Travel &amp; Adventure</option>
+          </select>
+        </label>
+        <label>
+          Search
+          <input id="admin-search" type="search" placeholder="Player or device ID" />
+        </label>
+        <label>
+          Rows
+          <select id="admin-page-size">
+            <option value="10">10</option>
+            <option value="20" selected>20</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+          </select>
+        </label>
       </div>
 
-      <section class="admin-card">
-        <h2>Leaderboard Snapshot</h2>
-        <div id="admin-leaderboard" class="admin-table-wrap"></div>
+      <nav class="admin-tabs" aria-label="Admin analytics sections">
+        <button id="admin-tab-overview" class="admin-tab is-active" type="button" data-tab="overview">Overview</button>
+        <button id="admin-tab-recent" class="admin-tab" type="button" data-tab="recentPlays">Recent Plays</button>
+        <button id="admin-tab-players" class="admin-tab" type="button" data-tab="playerStats">Players &amp; Devices</button>
+        <button id="admin-tab-leaderboard" class="admin-tab" type="button" data-tab="leaderboard">Leaderboard</button>
+        <button id="admin-tab-questions" class="admin-tab" type="button" data-tab="questionInsights">Question Insights</button>
+      </nav>
+
+      <section class="admin-card admin-panel" id="admin-panel">
+        <div class="admin-panel-header">
+          <div>
+            <h2 id="admin-panel-title">Overview</h2>
+            <p class="admin-muted" id="admin-panel-summary"></p>
+          </div>
+          <div class="admin-pagination" id="admin-pagination"></div>
+        </div>
+        <div id="admin-table" class="admin-table-wrap"></div>
       </section>
     </section>
   </main>
-  <script type="module" src="src/admin.js?v=20260521-admin"></script>
+  <script type="module" src="src/admin.js?v=20260521-admin-tabs"></script>
 </body>
 </html>

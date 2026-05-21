@@ -75,14 +75,15 @@ async function nextQuestion() {
   if (state.current >= CONFIG.questionsPerGame) { endGame(); return }
   const q = state.questions[state.current]
   await runShuffle(q)
-  showQuestion(q)
+  await showQuestion(q)
 }
 
 // ── Show question ─────────────────────────────────────────────────────────────
-function showQuestion(q) {
+async function showQuestion(q) {
   showStage('question')
-  state.answering = true
+  state.answering = false
   state.currentQ  = q
+  const assetPromises = []
 
   const badges = {
     'logo-to-name':   '🏷️ Name this brand',
@@ -109,6 +110,12 @@ function showQuestion(q) {
     const src     = logoUrl(q.correct.domain, CONFIG.logoSize)
     img.onload    = () => { LOG.event('img_load_ok',   { src }); LOG.logImgResult(q.correct.domain, true,  src) }
     img.onerror   = () => { LOG.event('img_load_fail', { src, domain: q.correct.domain }); LOG.logImgResult(q.correct.domain, false, src) }
+    assetPromises.push(trackLogoAsset(img, () => {
+      const fallback = document.createElement('span')
+      fallback.className = 'logo-fallback prompt-name'
+      fallback.textContent = q.correct.name
+      prompt.replaceChildren(fallback)
+    }))
     img.src       = src
     prompt.appendChild(img)
   } else {
@@ -144,6 +151,12 @@ function showQuestion(q) {
       const wrap = document.createElement('div')
       wrap.className = 'opt-logo-wrap'
       wrap.appendChild(optImg)
+      assetPromises.push(trackLogoAsset(optImg, () => {
+        const fallback = document.createElement('span')
+        fallback.className = 'logo-fallback opt-logo-fallback'
+        fallback.textContent = opt.name
+        wrap.replaceChildren(fallback)
+      }))
 
       const key = document.createElement('span')
       key.className   = 'opt-key'
@@ -163,10 +176,35 @@ function showQuestion(q) {
     container.appendChild(card)
   })
 
+  await waitForQuestionAssets(q, assetPromises)
+  state.answering = true
   startTimer(q, timeOut)
   SPEECH.listen(q, handleAnswer)
   updateHUD(state.current, state.score, CONFIG.questionsPerGame)
   focusFirstOption()
+}
+
+function trackLogoAsset(img, showFallback) {
+  return new Promise(resolve => {
+    let settled = false
+    function finish(failed) {
+      if (settled) return
+      settled = true
+      window.clearTimeout(timer)
+      if (failed) showFallback()
+      resolve()
+    }
+    const timer = window.setTimeout(() => finish(true), 1400)
+    img.addEventListener('load', () => finish(false), { once: true })
+    img.addEventListener('error', () => finish(true), { once: true })
+  })
+}
+
+async function waitForQuestionAssets(q, assetPromises = []) {
+  const feedback = $('question-feedback')
+  if (feedback && assetPromises.length) feedback.textContent = 'Loading logos...'
+  await Promise.all(assetPromises)
+  if (feedback && state.currentQ === q) feedback.textContent = 'Choose the best answer.'
 }
 
 function focusFirstOption() {
@@ -265,6 +303,12 @@ async function submitSharedScore() {
   try {
     const answerLog = state.answers.map(answer => ({
       choiceDomain: answer.chosen?.domain || null,
+      choiceName: answer.chosen?.name || null,
+      correctDomain: answer.logo?.domain || null,
+      correctName: answer.logo?.name || null,
+      pack: answer.pack,
+      mode: answer.mode,
+      pointsEarned: answer.pointsEarned,
       timeUsed: answer.timeUsed,
       timedOut: answer.timedOut,
     }))

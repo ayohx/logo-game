@@ -31,6 +31,14 @@ test('question options move keyboard focus to the first answer', () => {
   assert.ok(src.includes('.focus('), 'first option is not focused')
 })
 
+test('game waits for question logo assets before starting countdown', () => {
+  const src = read('src/game/engine.js')
+
+  assert.ok(src.includes('waitForQuestionAssets'), 'question asset wait helper missing')
+  assert.match(src, /await\s+waitForQuestionAssets\(q,[\s\S]*startTimer\(q,\s*timeOut\)/, 'timer should start only after required question assets are ready')
+  assert.ok(src.includes('logo-fallback'), 'failed logo loads should show a readable fallback')
+})
+
 test('speech module marks unsupported voice input for the UI', () => {
   const src = read('src/utils/speech.js')
 
