@@ -73,7 +73,7 @@
       <!-- Mic meter + pause + volume (right side) -->
       <div class="hud-right">
         <!-- Animated mic meter — visible when listening -->
-        <div id="mic-meter" class="mic-meter">
+        <div id="mic-meter" class="mic-meter" aria-hidden="true">
           <span>🎤</span>
           <div class="meter-bars">
             <div class="bar"></div>
@@ -82,10 +82,10 @@
             <div class="bar"></div>
           </div>
         </div>
-        <span id="voice-indicator" class="hidden"></span>
+        <span id="voice-indicator" class="hidden" aria-live="polite"></span>
 
         <!-- Pause button -->
-        <button id="btn-pause" class="pause-btn" title="Pause (P)">⏸</button>
+        <button id="btn-pause" class="pause-btn" title="Pause (P)" aria-label="Pause game">⏸</button>
 
         <!-- Volume control -->
         <div class="vol-wrap">
@@ -93,7 +93,7 @@
           <button id="btn-volume" class="vol-btn" title="Volume" aria-label="Volume settings">🎚</button>
           <div id="volume-panel" class="volume-panel hidden">
             <span class="vol-label">Volume</span>
-            <input type="range" id="volume-slider" min="0" max="1" step="0.05" value="0.7" />
+            <input type="range" id="volume-slider" min="0" max="1" step="0.05" value="0.7" aria-label="Volume level" />
           </div>
         </div>
       </div>

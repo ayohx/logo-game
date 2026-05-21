@@ -157,6 +157,13 @@ function showQuestion(q) {
   startTimer(q, timeOut)
   SPEECH.listen(q, handleAnswer)
   updateHUD(state.current, state.score, CONFIG.questionsPerGame)
+  focusFirstOption()
+}
+
+function focusFirstOption() {
+  requestAnimationFrame(() => {
+    document.querySelector('.option-card')?.focus({ preventScroll: true })
+  })
 }
 
 // ── Timer expiry ──────────────────────────────────────────────────────────────

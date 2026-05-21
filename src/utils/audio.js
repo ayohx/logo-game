@@ -1,8 +1,30 @@
 // ── Audio Engine — warm, musical feedback ─────────────────────────────────────
 let ctx        = null
 let masterGain = null
-let muted      = localStorage.getItem('logoquiz_muted') === 'true'
-let storedVol  = parseFloat(localStorage.getItem('logoquiz_vol') ?? '0.7')
+
+function readStorage(key, fallback) {
+  try {
+    return window.localStorage.getItem(key) ?? fallback
+  } catch {
+    return fallback
+  }
+}
+
+function writeStorage(key, value) {
+  try {
+    window.localStorage.setItem(key, value)
+  } catch {
+    // Storage can be blocked in private or embedded browser contexts.
+  }
+}
+
+function readStoredVolume() {
+  const vol = parseFloat(readStorage('logoquiz_vol', '0.7'))
+  return Number.isFinite(vol) ? Math.max(0, Math.min(1, vol)) : 0.7
+}
+
+let muted      = readStorage('logoquiz_muted', 'false') === 'true'
+let storedVol  = readStoredVolume()
 
 function getCtx() {
   if (!ctx) {
@@ -108,10 +130,10 @@ export const AUDIO = {
     const vol = Math.max(0, Math.min(1, v))
     storedVol = vol
     if (masterGain) masterGain.gain.value = vol
-    localStorage.setItem('logoquiz_vol', String(vol))
+    writeStorage('logoquiz_vol', String(vol))
     if (vol > 0) {
       muted = false
-      localStorage.setItem('logoquiz_muted', 'false')
+      writeStorage('logoquiz_muted', 'false')
     }
   },
 
@@ -121,7 +143,7 @@ export const AUDIO = {
 
   setMuted(nextMuted) {
     muted = Boolean(nextMuted)
-    localStorage.setItem('logoquiz_muted', String(muted))
+    writeStorage('logoquiz_muted', String(muted))
     if (masterGain) masterGain.gain.value = muted ? 0 : storedVol
   },
 

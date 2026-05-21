@@ -3,8 +3,20 @@ const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecogni
 
 let SPEECH
 
+function setSpeechAvailability(supported) {
+  document.body.classList.toggle('speech-unsupported', !supported)
+  const meter = document.getElementById('mic-meter')
+  if (meter) meter.setAttribute('aria-hidden', String(!supported))
+  const indicator = document.getElementById('voice-indicator')
+  if (indicator) {
+    indicator.textContent = supported ? 'Voice listening' : 'Voice input unavailable'
+    indicator.classList.toggle('hidden', true)
+  }
+}
+
 if (!SpeechRecognition) {
   SPEECH = { listen() {}, stop() {}, supported: false, isListening: false }
+  setSpeechAvailability(false)
 } else {
   const rec = new SpeechRecognition()
   rec.continuous      = false
@@ -64,6 +76,7 @@ if (!SpeechRecognition) {
       try { rec.stop() } catch { /* already stopped */ }
     },
   }
+  setSpeechAvailability(true)
 }
 
 export { SPEECH }

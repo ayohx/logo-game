@@ -297,6 +297,10 @@ body {
   pointer-events: all;
 }
 
+.speech-unsupported .mic-meter {
+  display: none;
+}
+
 .meter-bars {
   display: flex;
   align-items: flex-end;
