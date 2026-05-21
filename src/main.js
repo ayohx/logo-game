@@ -4,38 +4,65 @@ import { $, showScreen }  from './ui/screens.js'
 import { updateBestScore, initLogoParade, renderResults, renderHistory } from './ui/history.js'
 import { startGame, handleAnswer, pauseGame, resumeGame, getState } from './game/engine.js'
 import { CONFIG }      from './config.js'
-import { fetchLeaderboard, normalisePlayerName } from './utils/leaderboard.js'
+import { buildShareMessage, fetchLeaderboard, getPlayerProfile, normalisePlayerName, savePlayerProfile, saveProfileLocally } from './utils/leaderboard.js'
 
 // ── Navigation buttons ────────────────────────────────────────────────────────
 const playerNameInput = $('player-name')
+const avatarTypeInput = $('avatar-type')
+const profileAvatarInput = $('profile-avatar')
 const nameHelp = $('name-help')
+let activeProfile = getPlayerProfile()
 
-function getPlayerName() {
-  const playerName = normalisePlayerName(playerNameInput?.value)
-  if (playerNameInput) playerNameInput.value = playerName
-  return playerName
+function getProfileFromForm() {
+  const displayName = normalisePlayerName(playerNameInput?.value)
+  const avatarType = avatarTypeInput?.value === 'emoji' ? 'emoji' : 'initials'
+  const avatarValue = String(profileAvatarInput?.value || '').trim()
+  return saveProfileLocally({ ...activeProfile, displayName, avatarType, avatarValue })
 }
 
-if (playerNameInput) {
-  playerNameInput.value = localStorage.getItem('logoquiz_player_name') || ''
-  playerNameInput.addEventListener('input', () => {
-    if (nameHelp) nameHelp.textContent = 'Your best score will appear once on the shared scoreboard.'
-  })
+function syncProfileForm() {
+  activeProfile = getPlayerProfile()
+  if (playerNameInput) playerNameInput.value = activeProfile.displayName
+  if (avatarTypeInput) avatarTypeInput.value = activeProfile.avatarType
+  if (profileAvatarInput) profileAvatarInput.value = activeProfile.avatarValue
 }
+
+syncProfileForm()
+
+playerNameInput?.addEventListener('input', () => {
+  if (nameHelp) nameHelp.textContent = 'Your best score will appear once on the shared scoreboard.'
+})
+
+avatarTypeInput?.addEventListener('change', () => {
+  const profile = getProfileFromForm()
+  if (profileAvatarInput && profile.avatarType === 'initials' && !profileAvatarInput.value.trim()) {
+    profileAvatarInput.value = profile.displayName.replace(/[^A-Za-z0-9]/g, '').slice(0, 2).toUpperCase()
+  }
+})
+
+$('btn-save-profile').addEventListener('click', async () => {
+  try {
+    activeProfile = await savePlayerProfile(getProfileFromForm())
+    syncProfileForm()
+    if (nameHelp) nameHelp.textContent = 'Profile saved. Your leaderboard name will update without losing your best score.'
+  } catch (error) {
+    if (nameHelp) nameHelp.textContent = error instanceof Error ? error.message : 'Could not save profile.'
+  }
+})
 
 $('btn-brands').addEventListener('click', async () => {
-  const playerName = getPlayerName()
-  if (playerName.length < 2) {
+  const profile = getProfileFromForm()
+  if (profile.displayName.length < 2) {
     if (nameHelp) nameHelp.textContent = 'Please enter at least 2 letters or numbers before playing.'
     playerNameInput?.focus()
     return
   }
 
-  localStorage.setItem('logoquiz_player_name', playerName)
+  activeProfile = profile
   if (nameHelp) nameHelp.textContent = 'Starting shared game...'
 
   try {
-    await startGame('brands', playerName)
+    await startGame('brands', activeProfile)
   } catch (error) {
     if (nameHelp) nameHelp.textContent = error instanceof Error ? error.message : 'Could not start the shared game.'
   }
@@ -46,7 +73,7 @@ $('btn-leaderboard').addEventListener('click', () => renderLeaderboard())
 
 $('btn-play-again').addEventListener('click', () => {
   const { pack } = getState()
-  startGame(pack)
+  startGame(pack, activeProfile)
 })
 
 $('btn-switch-pack').addEventListener('click', () => {
@@ -60,6 +87,7 @@ $('btn-home').addEventListener('click', () => {
 })
 
 $('btn-results-history').addEventListener('click', () => renderHistory())
+$('btn-share-result').addEventListener('click', () => copyShareMessage())
 
 $('btn-history-back').addEventListener('click', () => {
   const state = getState()
@@ -79,19 +107,22 @@ $('btn-leaderboard-back').addEventListener('click', () => {
 
 async function renderLeaderboard() {
   const list = $('leaderboard-list')
+  const params = new URLSearchParams(window.location.search)
+  const linkedPlayerId = params.get('player') || ''
   showScreen('leaderboard')
   list.innerHTML = '<div class="empty-history"><p>Loading shared scores...</p></div>'
 
   try {
-    const { leaderboard } = await fetchLeaderboard()
+    const { leaderboard } = await fetchLeaderboard(linkedPlayerId)
     if (!leaderboard.length) {
       list.innerHTML = '<div class="empty-history"><p>No shared scores yet.</p><p class="empty-sub">Play the first round to claim the board.</p></div>'
       return
     }
 
     list.innerHTML = leaderboard.map(row => `
-      <div class="leaderboard-row">
+      <div class="leaderboard-row ${row.highlighted ? 'is-highlighted' : ''}">
         <span class="leaderboard-rank">#${row.rank}</span>
+        <span class="leaderboard-avatar">${row.avatarValue || '?'}</span>
         <span class="leaderboard-player">${row.playerName}</span>
         <span class="leaderboard-score">${row.bestScore} pts</span>
         <span class="leaderboard-meta">${row.bestCorrect}/10 · streak ${row.bestStreak} · ${row.gamesPlayed} game${row.gamesPlayed === 1 ? '' : 's'}</span>
@@ -99,6 +130,19 @@ async function renderLeaderboard() {
     `).join('')
   } catch (error) {
     list.innerHTML = `<div class="empty-history"><p>${error instanceof Error ? error.message : 'Could not load leaderboard.'}</p></div>`
+  }
+}
+
+async function copyShareMessage() {
+  const status = $('share-status')
+  const state = getState()
+  const message = buildShareMessage(state.leaderboardResult || { score: state.score }, activeProfile)
+
+  try {
+    await navigator.clipboard.writeText(message)
+    if (status) status.textContent = 'Share message copied to clipboard.'
+  } catch {
+    if (status) status.textContent = message
   }
 }
 
@@ -177,3 +221,4 @@ document.addEventListener('keydown', e => {
 // ── Boot ──────────────────────────────────────────────────────────────────────
 initLogoParade()
 updateBestScore()
+if (new URLSearchParams(window.location.search).has('player')) renderLeaderboard()

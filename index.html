@@ -24,8 +24,16 @@
       <div id="best-score" class="best-score"></div>
 
       <div class="player-entry">
-        <label for="player-name">Player name</label>
+        <label for="player-name">Profile name</label>
         <input id="player-name" name="player-name" type="text" maxlength="24" autocomplete="nickname" placeholder="Enter your name" />
+        <div class="avatar-entry">
+          <select id="avatar-type" aria-label="Avatar type">
+            <option value="initials">Initials</option>
+            <option value="emoji">Emoji</option>
+          </select>
+          <input id="profile-avatar" name="profile-avatar" type="text" maxlength="8" aria-label="Profile avatar" placeholder="AO" />
+          <button class="btn btn-ghost btn-sm" id="btn-save-profile" type="button">Save profile</button>
+        </div>
         <p id="name-help" class="name-help">Your best score will appear once on the shared scoreboard.</p>
       </div>
 
@@ -161,7 +169,9 @@
         <button class="btn btn-ghost btn-sm" id="btn-switch-pack">Change Pack</button>
         <button class="btn btn-ghost btn-sm" id="btn-home">🏠 Home</button>
         <button class="btn btn-ghost btn-sm" id="btn-results-history">History</button>
+        <button class="btn btn-ghost btn-sm" id="btn-share-result">Share Result</button>
       </div>
+      <p class="share-status" id="share-status" aria-live="polite"></p>
     </div>
   </div>
 

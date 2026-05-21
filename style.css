@@ -812,7 +812,7 @@ body {
 
 .leaderboard-row {
   display: grid;
-  grid-template-columns: 44px 1fr 72px;
+  grid-template-columns: 44px 40px 1fr 72px;
   gap: 10px;
   align-items: center;
   padding: 13px 16px;
@@ -820,11 +820,23 @@ body {
   border: 1px solid var(--card-border);
   border-radius: var(--radius-sm);
 }
+.leaderboard-row.is-highlighted { border-color: var(--warning); box-shadow: 0 0 0 1px rgba(255,210,63,0.25); }
 
 .leaderboard-rank { color: var(--warning); font-weight: 800; }
+.leaderboard-avatar {
+  display: inline-grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  color: #fff;
+  font-size: 0.9rem;
+  font-weight: 800;
+}
 .leaderboard-player { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 700; }
 .leaderboard-score { text-align: right; color: var(--success); font-weight: 800; }
-.leaderboard-meta { grid-column: 2 / 4; color: var(--text-muted); font-size: 0.72rem; }
+.leaderboard-meta { grid-column: 3 / 5; color: var(--text-muted); font-size: 0.72rem; }
 
 .history-card {
   background: var(--card);
@@ -911,8 +923,20 @@ details[open] .hs-arrow { transform: rotate(90deg); }
   font: inherit;
 }
 
+.avatar-entry {
+  display: grid;
+  grid-template-columns: 96px 1fr auto;
+  gap: 8px;
+}
+
+.avatar-entry select,
+.avatar-entry input {
+  padding: 10px 12px;
+}
+
 .name-help,
-.leaderboard-submit-status {
+.leaderboard-submit-status,
+.share-status {
   color: var(--text-muted);
   font-size: 0.78rem;
   line-height: 1.4;
