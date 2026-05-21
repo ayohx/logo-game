@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex,nofollow" />
+  <title>Logo Quiz Admin</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="admin-body">
+  <main class="admin-shell">
+    <section class="admin-card admin-login" id="admin-login">
+      <p class="admin-kicker">Logo Quiz Admin</p>
+      <h1>Analytics</h1>
+      <p class="admin-muted">Enter the admin password to view private play stats.</p>
+      <label for="admin-password">Password</label>
+      <div class="admin-login-row">
+        <input id="admin-password" type="password" autocomplete="current-password" />
+        <button class="btn btn-primary" id="btn-admin-login">View admin</button>
+      </div>
+      <p class="admin-error" id="admin-error" aria-live="polite"></p>
+    </section>
+
+    <section class="admin-dashboard hidden" id="admin-dashboard">
+      <div class="admin-header">
+        <div>
+          <p class="admin-kicker">Logo Quiz Admin</p>
+          <h1>Play Analytics</h1>
+          <p class="admin-muted" id="admin-generated"></p>
+        </div>
+        <button class="btn btn-ghost btn-sm" id="btn-admin-refresh">Refresh</button>
+      </div>
+
+      <div class="admin-stats" id="admin-stats"></div>
+
+      <div class="admin-grid">
+        <section class="admin-card">
+          <h2>Player Summary</h2>
+          <div id="admin-player-stats" class="admin-table-wrap"></div>
+        </section>
+        <section class="admin-card">
+          <h2>Recent Plays</h2>
+          <div id="admin-recent-plays" class="admin-table-wrap"></div>
+        </section>
+      </div>
+
+      <section class="admin-card">
+        <h2>Leaderboard Snapshot</h2>
+        <div id="admin-leaderboard" class="admin-table-wrap"></div>
+      </section>
+    </section>
+  </main>
+  <script type="module" src="src/admin.js?v=20260521-admin"></script>
+</body>
+</html>
