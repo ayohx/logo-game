@@ -134,13 +134,17 @@ atlassian.com    salesforce.com
 Logo-Game/
 ├── index.html          # Single-page app shell
 ├── style.css           # All styles — variables, animations, responsive
-├── game.js             # Game engine — state, scoring, question generation
-├── logos.js            # Curated logo pool with domain + display name pairs
-├── audio.js            # Web Audio API — tones for correct/wrong/tick/end
-├── speech.js           # Web Speech API wrapper — voice input with fallback
-├── config.js           # Token, timing constants, difficulty settings
+├── src/
+│   ├── config.js       # Game settings
+│   ├── data/brands.js  # Curated brand pool
+│   ├── game/           # Core engine, timer, question generation
+│   ├── ui/             # Screen transitions, shuffle, results/history
+│   └── utils/          # Audio, speech, helpers, logger
+├── debug.html          # Debug log viewer
 └── README.md
 ```
+
+The root-level `game.js`, `audio.js`, `logos.js`, `speech.js`, and related files are legacy artifacts from the refactor and are not part of the active runtime.
 
 ---
 

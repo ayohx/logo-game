@@ -80,6 +80,15 @@ body {
 }
 .btn:active { transform: scale(0.96); }
 
+.btn:focus-visible,
+.option-card:focus-visible,
+.pause-btn:focus-visible,
+.vol-btn:focus-visible,
+.pack-card:focus-visible {
+  outline: 2px solid var(--warning);
+  outline-offset: 2px;
+}
+
 .btn-primary {
   background: var(--primary);
   color: #fff;
@@ -247,6 +256,19 @@ body {
   pointer-events: none;
   animation: scorePop 0.85s var(--ease) forwards;
 }
+
+.question-feedback {
+  min-height: 1.6em;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-align: center;
+  padding: 0 12px;
+}
+
+.question-feedback.is-correct { color: var(--success); }
+.question-feedback.is-wrong   { color: var(--danger); }
+.question-feedback.is-timeout { color: var(--warning); }
 
 @keyframes scorePop {
   0%   { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
@@ -1027,10 +1049,26 @@ details[open] .hs-arrow { transform: rotate(90deg); }
   .game-title { font-size: 2.2rem; }
   .options-logo .option-card { width: calc(33.333% - 6px); min-width: 86px; }
   .br-row { grid-template-columns: 24px 24px 1fr 20px 38px 28px; gap: 5px; padding: 8px 10px; }
+  .question-feedback { font-size: 0.76rem; }
 }
 
 @media (min-height: 800px) {
   .shuffle-slot { width: 220px; height: 220px; }
   .prompt-logo  { width: 150px; height: 150px; }
   .timer-wrap   { width: 80px; height: 80px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .parade-item,
+  .mic-meter.active .bar,
+  .loading-spinner {
+    animation: none !important;
+  }
 }

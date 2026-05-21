@@ -49,17 +49,39 @@ $('btn-resume').addEventListener('click', () => resumeGame())
 // ── Volume control ────────────────────────────────────────────────────────────
 const volSlider = $('volume-slider')
 const volBtn    = $('btn-volume')
+const muteBtn   = $('btn-mute')
 const volPanel  = $('volume-panel')
 
 if (volSlider) {
   volSlider.value = AUDIO.getVolume()
-  volSlider.addEventListener('input', () => AUDIO.setVolume(parseFloat(volSlider.value)))
+  volSlider.addEventListener('input', () => {
+    AUDIO.setVolume(parseFloat(volSlider.value))
+    syncMuteButton()
+  })
+}
+
+function syncMuteButton() {
+  if (!muteBtn) return
+  const muted = AUDIO.isMuted()
+  muteBtn.textContent = muted ? '🔇' : '🔊'
+  muteBtn.setAttribute('aria-pressed', String(muted))
+  muteBtn.setAttribute('aria-label', muted ? 'Unmute sound' : 'Mute sound')
+  muteBtn.title = muted ? 'Unmute sound (M)' : 'Mute sound (M)'
 }
 
 if (volBtn) {
   volBtn.addEventListener('click', e => {
     e.stopPropagation()
     volPanel.classList.toggle('hidden')
+  })
+}
+
+if (muteBtn) {
+  syncMuteButton()
+  muteBtn.addEventListener('click', e => {
+    e.stopPropagation()
+    AUDIO.toggleMute()
+    syncMuteButton()
   })
 }
 
@@ -74,6 +96,12 @@ document.addEventListener('keydown', e => {
   // P key — pause/resume toggle
   if (e.key === 'p' || e.key === 'P') {
     paused ? resumeGame() : pauseGame()
+    return
+  }
+
+  if (e.key === 'm' || e.key === 'M') {
+    AUDIO.toggleMute()
+    syncMuteButton()
     return
   }
 

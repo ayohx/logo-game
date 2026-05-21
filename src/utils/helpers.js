@@ -9,6 +9,11 @@ export function shuffle(arr) {
   return a
 }
 
+export function prefersReducedMotion() {
+  if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return false
+  return window.matchMedia('(prefers-reduced-motion: reduce)').matches
+}
+
 export function getRank(score) {
   if (score >= 45) return { emoji: '🏆', label: 'Brand Genius',  color: '#ffd700' }
   if (score >= 35) return { emoji: '🥇', label: 'Logo Pro',      color: '#c0c0c0' }

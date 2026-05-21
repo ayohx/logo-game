@@ -1,12 +1,14 @@
 // ── Audio Engine — warm, musical feedback ─────────────────────────────────────
 let ctx        = null
 let masterGain = null
+let muted      = localStorage.getItem('logoquiz_muted') === 'true'
+let storedVol  = parseFloat(localStorage.getItem('logoquiz_vol') ?? '0.7')
 
 function getCtx() {
   if (!ctx) {
     ctx        = new (window.AudioContext || window.webkitAudioContext)()
     masterGain = ctx.createGain()
-    masterGain.gain.value = parseFloat(localStorage.getItem('logoquiz_vol') ?? '0.7')
+    masterGain.gain.value = muted ? 0 : storedVol
     masterGain.connect(ctx.destination)
   }
   return ctx
@@ -104,14 +106,32 @@ export const AUDIO = {
 
   setVolume(v) {
     const vol = Math.max(0, Math.min(1, v))
+    storedVol = vol
     if (masterGain) masterGain.gain.value = vol
     localStorage.setItem('logoquiz_vol', String(vol))
+    if (vol > 0) {
+      muted = false
+      localStorage.setItem('logoquiz_muted', 'false')
+    }
   },
 
   getVolume() {
-    return masterGain
-      ? masterGain.gain.value
-      : parseFloat(localStorage.getItem('logoquiz_vol') ?? '0.7')
+    return storedVol
+  },
+
+  setMuted(nextMuted) {
+    muted = Boolean(nextMuted)
+    localStorage.setItem('logoquiz_muted', String(muted))
+    if (masterGain) masterGain.gain.value = muted ? 0 : storedVol
+  },
+
+  toggleMute() {
+    this.setMuted(!muted)
+    return muted
+  },
+
+  isMuted() {
+    return muted
   },
 
   resume() {

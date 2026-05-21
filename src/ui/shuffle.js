@@ -2,7 +2,7 @@
 import { $, logoUrl, showStage } from './screens.js'
 import { LOGO_POOL }             from '../data/brands.js'
 import { CONFIG }                from '../config.js'
-import { shuffle }               from '../utils/helpers.js'
+import { prefersReducedMotion, shuffle } from '../utils/helpers.js'
 
 export function runShuffle(q) {
   showStage('shuffle')
@@ -17,8 +17,26 @@ export function runShuffle(q) {
   label.textContent = 'Get ready…'
 
   const showsImage = q.mode === 'logo-to-name'
+  const reducedMotion = prefersReducedMotion()
 
   return new Promise(resolve => {
+    if (reducedMotion) {
+      if (showsImage) {
+        slotImg.classList.remove('hidden')
+        slotImg.src = logoUrl(q.correct.domain, CONFIG.logoSize)
+        slotImg.style.filter = 'none'
+        label.textContent = 'Name this brand'
+        setTimeout(() => resolve(), 120)
+      } else {
+        slotText.classList.remove('hidden')
+        slotText.textContent = q.correct.name
+        slotText.style.opacity = '1'
+        label.textContent = 'Find the logo'
+        setTimeout(() => resolve(), 120)
+      }
+      return
+    }
+
     if (showsImage) {
       slotImg.classList.remove('hidden')
       const targetSrc  = logoUrl(q.correct.domain, CONFIG.logoSize)

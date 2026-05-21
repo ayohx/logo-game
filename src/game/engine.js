@@ -87,6 +87,11 @@ function showQuestion(q) {
   // Prompt
   const prompt = $('prompt')
   prompt.innerHTML = ''
+  const feedback = $('question-feedback')
+  if (feedback) {
+    feedback.textContent = 'Choose the best answer.'
+    feedback.className = 'question-feedback'
+  }
 
   if (q.mode === 'logo-to-name') {
     const img = document.createElement('img')
@@ -114,7 +119,9 @@ function showQuestion(q) {
   q.options.forEach((opt, i) => {
     const card     = document.createElement('button')
     card.className = 'option-card'
+    card.type      = 'button'
     card.dataset.index = i
+    card.setAttribute('aria-label', `${labels[i]}. ${opt.name}`)
 
     if (optAsImage) {
       const optSrc  = logoUrl(opt.domain, CONFIG.optLogoSize)
@@ -186,6 +193,7 @@ export function handleAnswer(idx) {
 }
 
 function revealAnswer(q, chosenIdx, points, secsUsed) {
+  const feedback = $('question-feedback')
   document.querySelectorAll('.option-card').forEach((card, i) => {
     card.disabled = true
     if      (i === q.correctIndex)                            card.classList.add('correct')
@@ -194,6 +202,17 @@ function revealAnswer(q, chosenIdx, points, secsUsed) {
   })
 
   if (points > 0) showScorePop(points)
+
+  if (feedback) {
+    const correctName = q.correct?.name || 'the correct answer'
+    const chosenCorrect = chosenIdx === q.correctIndex
+    feedback.className = `question-feedback ${chosenCorrect ? 'is-correct' : chosenIdx === -1 ? 'is-timeout' : 'is-wrong'}`
+    feedback.textContent = chosenCorrect
+      ? `Correct. ${correctName} +${points} pts.`
+      : chosenIdx === -1
+        ? `Time ran out. Correct answer: ${correctName}.`
+        : `Not quite. Correct answer: ${correctName}.`
+  }
 
   state.answers.push({
     pack:         q.pack,

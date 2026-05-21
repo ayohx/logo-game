@@ -44,10 +44,12 @@ export function renderResults(answers, score) {
 
   const correctCount = answers.filter(a => a.correct).length
   const avgTime      = (answers.reduce((s, a) => s + a.timeUsed, 0) / answers.length).toFixed(1)
+  const fastestTime  = Math.min(...answers.map(a => a.timeUsed)).toFixed(1)
 
   $('result-stats').innerHTML = `
     <span>${correctCount}/${CONFIG.questionsPerGame} correct</span>
     <span>Avg ${avgTime}s per answer</span>
+    <span>Fastest ${fastestTime}s</span>
   `
 
   $('breakdown').innerHTML = answers.map((a, i) => {

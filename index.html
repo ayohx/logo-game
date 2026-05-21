@@ -89,7 +89,8 @@
 
         <!-- Volume control -->
         <div class="vol-wrap">
-          <button id="btn-volume" class="vol-btn" title="Volume">🔊</button>
+          <button id="btn-mute" class="vol-btn" title="Mute sound (M)" aria-pressed="false" aria-label="Mute sound">🔊</button>
+          <button id="btn-volume" class="vol-btn" title="Volume" aria-label="Volume settings">🎚</button>
           <div id="volume-panel" class="volume-panel hidden">
             <span class="vol-label">Volume</span>
             <input type="range" id="volume-slider" min="0" max="1" step="0.05" value="0.7" />
@@ -111,6 +112,7 @@
     <div id="question-stage" class="question-stage hidden">
       <div class="mode-badge" id="mode-badge"></div>
       <div class="prompt" id="prompt"></div>
+      <div id="question-feedback" class="question-feedback" aria-live="polite"></div>
       <div class="timer-wrap">
         <svg class="timer-ring" viewBox="0 0 100 100">
           <circle class="timer-track" cx="50" cy="50" r="45" />
@@ -121,7 +123,7 @@
       <div class="options" id="options"></div>
       <p class="key-hint">
         Press <kbd>A</kbd> <kbd>B</kbd> <kbd>C</kbd> &nbsp;or&nbsp; <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd>
-        &nbsp;&nbsp;<kbd>P</kbd> = Pause
+        &nbsp;&nbsp;<kbd>P</kbd> = Pause &nbsp;&nbsp;<kbd>M</kbd> = Mute
       </p>
     </div>
 
