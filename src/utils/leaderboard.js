@@ -25,7 +25,7 @@ async function callFunction(name, options = {}) {
 }
 
 export function normalisePlayerName(name) {
-  return String(name || '').trim().replace(/\s+/g, ' ').slice(0, 24)
+  return String(name || '').trim().replace(/\s+/g, ' ').slice(0, 10).trim()
 }
 
 function makePlayerId() {

@@ -25,10 +25,10 @@
 
       <div class="player-entry">
         <label for="player-name">Profile name</label>
-        <input id="player-name" name="player-name" type="text" maxlength="24" autocomplete="nickname" placeholder="Enter your name" />
+        <input id="player-name" name="player-name" type="text" maxlength="10" autocomplete="nickname" placeholder="Enter your name" />
         <div class="avatar-entry">
           <input id="avatar-type" type="hidden" value="initials" />
-          <input id="profile-avatar" name="profile-avatar" type="text" maxlength="8" aria-label="Profile avatar" placeholder="AO" />
+          <input id="profile-avatar" name="profile-avatar" type="text" maxlength="8" aria-label="Profile avatar preview" placeholder="AO" readonly />
           <button class="btn btn-ghost btn-sm" id="btn-save-profile" type="button">Save profile</button>
         </div>
         <div class="avatar-presets" id="avatar-presets" aria-label="Choose an avatar">

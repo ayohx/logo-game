@@ -938,6 +938,15 @@ details[open] .hs-arrow { transform: rotate(90deg); }
   padding: 10px 12px;
 }
 
+.avatar-entry input[readonly] {
+  cursor: default;
+}
+
+.avatar-entry input.is-saved-feedback {
+  border-color: var(--success);
+  box-shadow: 0 0 0 2px rgba(67,233,123,0.22);
+}
+
 .avatar-presets {
   display: flex;
   flex-wrap: wrap;
@@ -967,6 +976,7 @@ details[open] .hs-arrow { transform: rotate(90deg); }
 
 .avatar-choice:first-child {
   padding-inline: 12px;
+  border-color: var(--card-border);
   color: var(--text-muted);
   font-size: 0.74rem;
   font-weight: 800;

@@ -12,6 +12,25 @@ const avatarTypeInput = $('avatar-type')
 const profileAvatarInput = $('profile-avatar')
 const nameHelp = $('name-help')
 let activeProfile = getPlayerProfile()
+let selectedEmoji = activeProfile.avatarType === 'emoji' ? emojiFromAvatarValue(activeProfile.avatarValue) : ''
+
+function initialsForName(name) {
+  return normalisePlayerName(name).replace(/[^A-Za-z0-9]/g, '').slice(0, 2).toUpperCase() || '??'
+}
+
+function emojiFromAvatarValue(value) {
+  const emojiButton = [...document.querySelectorAll('.avatar-choice[data-avatar-type="emoji"]')]
+    .find(button => String(value || '').startsWith(button.dataset.avatarValue || ''))
+  return emojiButton?.dataset.avatarValue || ''
+}
+
+function updateAvatarPreview() {
+  if (!profileAvatarInput) return
+  const initials = initialsForName(playerNameInput?.value)
+  profileAvatarInput.value = avatarTypeInput?.value === 'emoji' && selectedEmoji
+    ? `${selectedEmoji}${initials}`
+    : initials
+}
 
 function getProfileFromForm() {
   const displayName = normalisePlayerName(playerNameInput?.value)
@@ -25,27 +44,25 @@ function syncProfileForm() {
   if (playerNameInput) playerNameInput.value = activeProfile.displayName
   if (avatarTypeInput) avatarTypeInput.value = activeProfile.avatarType
   if (profileAvatarInput) profileAvatarInput.value = activeProfile.avatarValue
+  selectedEmoji = activeProfile.avatarType === 'emoji' ? emojiFromAvatarValue(activeProfile.avatarValue) : ''
+  updateAvatarPreview()
   syncAvatarChoices(activeProfile)
 }
 
 syncProfileForm()
 
 playerNameInput?.addEventListener('input', () => {
-  if (avatarTypeInput?.value === 'initials' && profileAvatarInput) {
-    profileAvatarInput.value = playerNameInput.value.replace(/[^A-Za-z0-9]/g, '').slice(0, 2).toUpperCase()
-  }
+  updateAvatarPreview()
   if (nameHelp) nameHelp.textContent = 'Your best score will appear once on the shared scoreboard.'
 })
 
 document.querySelectorAll('.avatar-choice').forEach(button => {
   button.addEventListener('click', () => {
     const avatarType = button.dataset.avatarType === 'emoji' ? 'emoji' : 'initials'
-    const avatarValue = avatarType === 'emoji'
-      ? button.dataset.avatarValue
-      : playerNameInput.value.replace(/[^A-Za-z0-9]/g, '').slice(0, 2).toUpperCase()
+    selectedEmoji = avatarType === 'emoji' ? button.dataset.avatarValue : ''
 
     if (avatarTypeInput) avatarTypeInput.value = avatarType
-    if (profileAvatarInput) profileAvatarInput.value = avatarValue || '??'
+    updateAvatarPreview()
     activeProfile = getProfileFromForm()
     syncAvatarChoices(activeProfile)
   })
@@ -55,6 +72,7 @@ $('btn-save-profile').addEventListener('click', async () => {
   try {
     activeProfile = await savePlayerProfile(getProfileFromForm())
     syncProfileForm()
+    showProfileSavedFeedback()
     if (nameHelp) nameHelp.textContent = 'Profile saved. Your leaderboard name will update without losing your best score.'
   } catch (error) {
     if (nameHelp) nameHelp.textContent = error instanceof Error ? error.message : 'Could not save profile.'
@@ -89,10 +107,16 @@ async function startSelectedGame() {
 function syncAvatarChoices(profile) {
   document.querySelectorAll('.avatar-choice').forEach(button => {
     const isActive = button.dataset.avatarType === profile.avatarType &&
-      (profile.avatarType === 'initials' || button.dataset.avatarValue === profile.avatarValue)
+      (profile.avatarType === 'initials' || button.dataset.avatarValue === selectedEmoji)
     button.classList.toggle('is-active', isActive)
     button.setAttribute('aria-pressed', String(isActive))
   })
+}
+
+function showProfileSavedFeedback() {
+  if (!profileAvatarInput) return
+  profileAvatarInput.classList.add('is-saved-feedback')
+  window.setTimeout(() => profileAvatarInput.classList.remove('is-saved-feedback'), 1400)
 }
 
 $('btn-history').addEventListener('click', () => renderHistory())

@@ -33,8 +33,18 @@ test('start screen has profile name and avatar editing controls', () => {
   assert.ok(html.includes('profile-avatar'), 'avatar input missing')
   assert.ok(html.includes('avatar-type'), 'avatar type selector missing')
   assert.ok(html.includes('btn-save-profile'), 'save profile button missing')
+  assert.ok(html.includes('maxlength="10"'), 'profile name should be capped at 10 characters')
+  assert.ok(html.includes('readonly'), 'avatar preview should be generated from the name and selected emoji')
   assert.ok(html.includes('avatar-presets'), 'visible avatar preset choices missing')
   assert.ok(html.includes('data-avatar-type="emoji"'), 'emoji preset choices missing')
+})
+
+test('main keeps avatar preview synced to initials and selected emoji', () => {
+  const src = read('src/main.js')
+
+  assert.ok(src.includes('initialsForName'), 'initials helper missing')
+  assert.ok(src.includes('updateAvatarPreview'), 'avatar preview update helper missing')
+  assert.ok(src.includes('selectedEmoji'), 'selected emoji state missing')
 })
 
 test('start screen has an obvious start game button', () => {
@@ -80,6 +90,7 @@ test('start screen uses mobile-safe responsive layout rules', () => {
   const css = read('style.css')
 
   assert.ok(css.includes('#screen-start'), 'start screen rules missing')
+  assert.ok(css.includes('is-saved-feedback'), 'save success feedback style missing')
   assert.ok(css.includes('justify-content: flex-start'), 'start screen should not vertically centre overflowing mobile content')
   assert.ok(css.includes('@media (max-height: 760px)'), 'small-height mobile layout rules missing')
   assert.ok(css.includes('.parade-item:nth-child(n + 7)'), 'extra mobile parade logos should be hidden on short screens')
