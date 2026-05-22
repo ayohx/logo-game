@@ -22,8 +22,16 @@ test('question generation supports selected pack pools', () => {
   const src = read('src/game/questions.js')
 
   assert.ok(src.includes('TRAVEL_POOL'), 'travel pool import missing')
+  assert.ok(src.includes('ALL_LOGO_POOL'), 'Mix Brands should use the full verified logo set')
   assert.ok(src.includes('PACK_POOLS'), 'pack pool registry missing')
   assert.ok(src.includes('generateQuestions'), 'pack-aware question generator missing')
+})
+
+test('Mix Brands combines General and Travel logo pools', () => {
+  const src = read('src/game/questions.js')
+
+  assert.match(src, /brands:\s*ALL_LOGO_POOL/, 'brands pack should use all verified logos')
+  assert.ok(src.includes('dedupeByDomain'), 'combined pool should dedupe domains safely')
 })
 
 test('start screen exposes Travel and Adventure pack selection', () => {

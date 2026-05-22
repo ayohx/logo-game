@@ -1,8 +1,8 @@
 # Logo Game Consolidated Plan
 
-Last updated: 2026-05-21
+Last updated: 2026-05-22
 
-This document merges the original improvement plan, the leaderboard/profile/admin work that was added during implementation, and the new admin analytics plus Supabase logo-storage plan. It is the single planning tracker before we resume implementation.
+This document is the source of truth for what has been planned, what has shipped, and what remains for Logo Game. It now covers the original game improvements, leaderboard/profile/admin work, Travel & Adventure, Supabase logo storage, the next live verification pass, and the next expansion ideas.
 
 ## Execution Rules
 
@@ -12,15 +12,53 @@ This document merges the original improvement plan, the leaderboard/profile/admi
 - Keep Supabase work isolated inside the `logo_game` schema and Edge Functions.
 - Keep anti-cheat logic server-side: questions and score validation must not depend on browser trust.
 - Use British spelling and wording for any new user-facing copy.
+- For live browser checks, use the Codex Chrome MCP tab group and test the deployed GitHub Pages URL: `https://ayohx.github.io/logo-game/`.
 
 ## Current Status Summary
 
-- The original game improvement work is mostly complete and pushed.
-- The shared leaderboard, editable profiles, admin page, and Travel & Adventure pack are complete and pushed.
-- There are local fixes for logo loading reliability and mobile avatar layout that are tested but not committed or pushed.
-- The admin analytics redesign is now implemented and deployed to Supabase, with frontend changes ready to push.
-- The Supabase Storage bucket, registry table, and local sync script are now in place.
-- Logo Storage runtime support is code-ready but intentionally disabled until the logo upload is completed with a Supabase service-role key.
+- The original game improvement work is complete and pushed.
+- The Supabase-backed anti-cheat shared leaderboard is complete and pushed.
+- Editable player profiles, stable player IDs, avatars, share links, and persistent best-score behaviour are complete and pushed.
+- The Travel & Adventure pack is complete and pushed with 100 logos, including Holiday Extras.
+- `/admin.html` is live with passworded analytics, tabs, filters, sorting, pagination, overview cards, player/device stats, leaderboard, question insights, and Logo Health.
+- Old root-level runtime files have been cleaned so `src/` remains the active app.
+- Supabase Storage logo infrastructure is complete and pushed.
+- Current logo assets are uploaded and verified in Supabase Storage:
+  - 230/230 uploaded
+  - 230/230 verified
+  - 0 missing
+- The live game now loads logos from Supabase Storage first, with logo.dev only as fallback.
+- Latest full test suite: `111/111` passing after all-logo Mix Brands.
+- Latest pushed commit before all-logo mode: `2fc3651 feat: enable Supabase logo storage`.
+- Current next step: push all-logo Mix Brands, then build the Tech & Car pack.
+- Next expansion packs selected for planning: Tech & Car, then Fashion & Finance.
+
+## Remaining Work To Complete
+
+1. Live play-test the deployed game.
+   - Desktop and mobile.
+   - Mix Brands and Travel & Adventure.
+   - Confirm logo loading speed, no blank-logo countdowns, result submission, leaderboard behaviour, and admin analytics updates.
+2. Change General/Mix Brands into an all-logo mode. Done locally and deployed to Supabase; pending push.
+   - Use every verified enabled logo from Supabase Storage.
+   - Deduplicate domains across packs.
+   - Keep the public label as Mix Brands for now.
+   - Keep specialist packs as filtered modes.
+3. Build the Tech & Car pack.
+   - Curate at least 100 recognisable domains.
+   - Verify all logos through the storage sync process.
+   - Add source data, shared pack config, server allowlist updates, UI selector support, tests, and live play-testing.
+4. Build the Fashion & Finance pack.
+   - Repeat the same 100-logo process after Tech & Car.
+   - Keep the candidate list recognisable and balanced across UK/global brands.
+5. Upgrade the admin experience.
+   - Improve visual hierarchy, charts, Logo Health, Question Insights, player analytics, date filtering, and CSV export.
+6. Keep later expansion ideas parked until the core roadmap above is complete.
+   - Food, Drink & Restaurants.
+   - Sport, Media & Entertainment.
+   - Weekly/monthly leaderboard.
+   - Logo review workflow.
+   - Difficulty tuning and logo archive/disable support.
 
 ## Done And Pushed
 
@@ -34,9 +72,9 @@ This document merges the original improvement plan, the leaderboard/profile/admi
   - Commit: `48605d6 feat: improve results feedback`
 - [x] Add audio and accessibility polish.
   - Commit: `2a25a82 feat: polish audio and accessibility`
+- [x] Add pause/session/debug support.
 - [x] Run source tests before commits.
-  - Continued across implementation phases.
-- [x] Clean up legacy root-level clutter only if it affects clarity.
+- [x] Clean up legacy root-level clutter.
   - Legacy root runtime files were removed because they duplicated the active `src/` module system.
 
 ### Shared Leaderboard And Anti-Cheat
@@ -44,7 +82,7 @@ This document merges the original improvement plan, the leaderboard/profile/admi
 - [x] Add Supabase-backed shared leaderboard.
   - Commit: `4ad57f3 feat: add Supabase shared leaderboard`
   - Server issues questions and validates submitted answers.
-- [x] Retain one best score per player name.
+- [x] Retain one best score per player name/player identity.
   - Lower later scores do not replace retained best.
 - [x] Keep score submission server-side through Edge Functions.
   - Browser submits answer log; server validates against stored session questions.
@@ -53,7 +91,7 @@ This document merges the original improvement plan, the leaderboard/profile/admi
 
 - [x] Add editable no-password player profiles.
   - Commit: `7993387 feat: add editable leaderboard profiles`
-- [x] Add leaderboard avatars.
+- [x] Add leaderboard avatars, emoji initials, and profile editing.
 - [x] Add share result flow with player-specific leaderboard link.
 - [x] Improve profile start flow.
   - Commit: `dc97706 fix: improve profile start flow`
@@ -66,17 +104,20 @@ This document merges the original improvement plan, the leaderboard/profile/admi
 - [x] Refresh cached profile script after API changes.
   - Commit: `60ccda6 fix: refresh profile script cache`
 
-### Admin Analytics V1
+### Admin Analytics
 
 - [x] Add simple passworded admin analytics page.
   - Commit: `2f514a9 feat: add passworded admin analytics`
 - [x] Add admin password setting in database.
 - [x] Add per-play analytics table.
-- [x] Show current overview cards, player summary, recent plays, and leaderboard snapshot.
-- [ ] Add advanced tabs, filtering, sorting, pagination, and question-level analytics.
-  - Planned in the next workstream.
+- [x] Show overview cards, player summary, recent plays, and leaderboard snapshot.
+- [x] Add advanced admin analytics.
+  - Commit: `ce77f37 feat: expand admin analytics and stabilise logos`
+  - Added tabs, filters, sorting, pagination, richer overview cards, player/device stats, leaderboard, question insights, and Logo Health.
+- [x] Add per-question analytics writes through `logo_game.play_answers`.
+- [x] Keep RLS enabled and restrict admin access through Edge Functions.
 
-### Travel & Adventure Pack And Logo Credit Savings
+### Travel & Adventure Pack
 
 - [x] Add Travel & Adventure pack with 100 logos.
   - Commit: `9ad0d22 feat: add travel pack with logo credit savings`
@@ -87,140 +128,205 @@ This document merges the original improvement plan, the leaderboard/profile/admi
 - [x] Reduce homepage logo parade from 10 to 6 selected-pack logos.
 - [x] Cache-bust frontend entry point after Travel pack changes.
 
-## Done Locally Or Deployed But Not Pushed
+### Supabase Logo Storage
 
-These changes are present in the working tree and were tested locally, but they are not committed or pushed.
+- [x] Create public Supabase Storage bucket: `logo-game-logos`.
+- [x] Add `logo_game.logo_assets` registry.
+- [x] Add `scripts/sync-logo-assets.mjs`.
+- [x] Add secure `logo-game-logo-assets` Edge Function for registry writes.
+- [x] Upload and verify all current logo assets.
+  - 230/230 uploaded.
+  - 230/230 verified.
+  - 0 missing.
+- [x] Switch runtime logo loading to Supabase Storage first.
+  - Commit: `2fc3651 feat: enable Supabase logo storage`
+- [x] Keep logo.dev as fallback only.
+- [x] Add readable brand-name fallback if both stored logo and logo.dev fail.
+- [x] Add Logo Health admin tab backed by `logo_game.logo_assets`.
+- [x] Verify Supabase Storage spot checks return `200 image/png`.
 
-- [x] Wait for required question logo assets before starting the countdown.
-  - Files: `src/game/engine.js`, `test/accessibility-audio.test.mjs`
-  - Purpose: prevent players seeing a blank logo while the timer is already running.
-- [x] Show readable brand-name fallback if a prompt or option logo fails to load.
-  - Files: `src/game/engine.js`, `style.css`
-- [x] Make mobile avatar emoji choices smaller and non-wrapping.
-  - Files: `style.css`, `test/profile-sharing.test.mjs`
-  - Purpose: keep the final star emoji on the same row on mobile.
-- [x] Cache-bust `style.css` and `src/main.js` for the local logo loading fix.
-  - File: `index.html`
-- [x] Full local test suite passed after these changes.
-  - `node --test test/*.test.mjs`
-  - Result: `104/104` passing after admin work.
-- [x] Admin analytics schema was deployed to Supabase.
-  - Added `logo_game.play_answers`.
-  - Added summary columns on `logo_game.plays`.
-- [x] `logo-game-submit` was deployed with per-question analytics writes.
-- [x] `logo-game-admin` was deployed with tab-specific, filtered, sorted, paged analytics responses.
-- [x] Admin frontend was redesigned locally with tabs, filters, page size, sorting, pagination, and richer overview cards.
+## Active Workstream: Live Play-Testing And Admin Verification
 
-## Completed Workstream: Admin Analytics Redesign
+Goal: verify that the deployed game feels reliable now that logos are served from Supabase Storage, and confirm admin analytics update correctly from real plays.
 
-Goal: make `/admin.html` useful as the game grows, without dumping everything into one large page.
+### Desktop
 
-### Database
+- [ ] Open the live GitHub Pages URL in the Codex Chrome MCP tab group.
+- [ ] Play Mix Brands from start to result.
+- [ ] Confirm prompt logos and option logos load quickly.
+- [ ] Confirm countdown does not start while a required prompt logo is blank.
+- [ ] Confirm failed logo fallback behaviour is acceptable if any image fails.
+- [ ] Submit/record result and confirm public leaderboard behaviour.
+- [ ] Repeat for Travel & Adventure.
 
-- [x] Add `logo_game.play_answers` table.
-  - One row per question answered.
-  - Stores player/device identity, pack, question number, mode, correct logo, chosen logo, correctness, timeout status, answer time, points earned, and timestamp.
-- [x] Add extra summary columns to `logo_game.plays` only where useful.
-  - Candidate columns: `pack`, `timeout_count`, `wrong_count`, `slowest_time`, `completed_questions`.
-- [x] Keep RLS enabled and restrict access through Edge Functions.
+### Mobile
 
-### Edge Functions
+- [ ] Test mobile viewport or real mobile-sized browser.
+- [ ] Play Mix Brands from start to result.
+- [ ] Play Travel & Adventure from start to result.
+- [ ] Confirm options, profile/avatar controls, countdown, result screen, share link, and leaderboard are usable without wrapping/overlap.
 
-- [x] Update `logo-game-submit`.
-  - Continue writing one completed-game summary row.
-  - Also write ten per-question `play_answers` rows per completed session.
-- [x] Update `logo-game-admin`.
-  - Return tab-specific datasets instead of one large response.
-  - Support pagination, sorting, filters, and search.
+### Admin
 
-### Admin UI
+- [ ] Open `/admin.html` after live plays.
+- [ ] Confirm overview totals update.
+- [ ] Confirm Recent Plays includes the new games.
+- [ ] Confirm Players & Devices updates the current player/device.
+- [ ] Confirm Leaderboard reflects retained best-score rules.
+- [ ] Confirm Question Insights gains new answer rows.
+- [ ] Confirm Logo Health remains 230 verified / 0 missing.
 
-- [x] Redesign `admin.html` into tabs:
-  - Overview
-  - Recent Plays
-  - Players and Devices
-  - Leaderboard
-  - Question Insights
-  - Logo Health, after storage migration remains future work
-- [x] Add overview cards:
-  - Games started
-  - Completed games
-  - Completion rate
-  - Unique players/devices
-  - Average score
-  - Average correct answers
-  - Average answer speed
-  - Fastest average player
-  - Most played pack
-  - Total timeouts
-- [x] Add table controls:
-  - Page size: 10, 20, 50, 100
-  - Sortable headers
-  - Pack filter
-  - Player/device search
-  - Refresh
-- [x] Add question insights:
-  - Hardest logos by wrong rate
-  - Most timed-out logos
-  - Fastest answered logos
-  - Slowest answered logos
-  - Most common wrong choices
+## Completed Workstream: General Mode Uses All Logos
 
-## Active Workstream: Supabase Logo Storage
+Goal: make the default General/Mix Brands mode use the full verified logo catalogue, not just the original General pool, while category-specific modes remain curated.
 
-Goal: stop relying on live logo.dev requests during gameplay and serve verified assets from Supabase Storage.
+### Product Decision
+
+- [x] Treat General as "all available logos".
+  - Include every verified logo from every enabled pack unless a logo is explicitly disabled.
+  - Keep dedicated packs such as Travel & Adventure as filtered experiences.
+- [x] Decide whether the label should stay "Mix Brands" or become "All Logos".
+  - Decision: keep "Mix Brands" for now to avoid changing the UI label while expanding the pool.
+- [x] Decide whether General should include future specialist packs automatically.
+  - Recommended: yes, but only after each pack passes the 100-logo verification gate and is enabled.
+
+### Data Model
+
+- [x] Add a catalogue-level pool builder that deduplicates by domain across all enabled packs.
+- [x] Keep each logo's pack membership and category metadata.
+- [x] Make question generation accept:
+  - `all` / `general`: deduped enabled catalogue.
+  - pack IDs such as `travel`: specific curated pool.
+- [x] Ensure server-issued questions use the same pool rules as the browser.
+- [x] Confirm Supabase `logo_assets` metadata supports pack filtering through the `packs` array.
+
+### Gameplay
+
+- [x] Keep pack selector copy and route/state handling stable.
+- [x] Make General distractors pull from the all-logo catalogue.
+- [x] Ensure duplicate domains appear only once per General pool.
+- [x] Preserve category-balanced correct-answer selection where possible.
+- [x] Add tests proving General includes both original brand logos and Travel logos.
 
 ### Storage
 
-- [x] Create public Supabase Storage bucket.
-  - Proposed bucket: `logo-game-logos`
-- [x] Store versioned assets.
-  - Example paths:
-    - `v1/apple.com.png`
-    - `v1/holidayextras.com.png`
-    - `v1/britishairways.com.png`
-- [x] Use public CDN URLs for gameplay.
-  - Supabase docs confirm public Storage buckets are CDN-backed and should have high cache-hit rates after first load.
+- [x] Ensure new General mode only uses verified Supabase Storage assets.
+- [x] Keep logo.dev fallback for runtime resilience, not normal loading.
+- [ ] Update sync script so future packs are included without manually editing multiple import lists.
 
-### Metadata
+## Planned Workstream: New 100+ Logo Category Packs
 
-- [x] Add `logo_game.logo_assets` table.
-  - Fields: domain, name, pack, category, storage path, public URL, source URL, status, content type, content hash, verified date, updated date.
-- [x] Track status:
-  - `verified`
-  - `missing`
-  - `needs_review`
+Goal: add more category packs only when each pack can provide at least 100 recognisable, verified logos.
 
-### Migration Script
+### Logo.dev Discovery Notes
 
-- [x] Add local script to sync logos.
-  - Proposed path: `scripts/sync-logo-assets.mjs`
-- [x] Read `src/data/brands.js` and `src/data/travel.js`.
-- [x] Deduplicate all current General and Travel domains.
-- [x] Download each logo from logo.dev once.
-- [x] Validate image responses.
-- [x] Save a review manifest.
-- [x] Upload verified files to Supabase Storage.
-  - 230/230 assets uploaded and verified.
-- [x] Upsert `logo_game.logo_assets`.
-  - 230/230 registry rows written.
-- [x] Use environment variables only for credentials.
+- [ ] Validate against Logo.dev before implementation.
+  - The public Logo.dev category directory does not currently show a single category with 100+ brands.
+  - The largest visible public categories are below the 100-logo target, so new packs should be curated composites rather than direct one-category imports.
+- [ ] Use the 100-logo gate for every new pack.
+  - At least 100 candidate domains.
+  - At least 100 verified Supabase Storage uploads.
+  - 0 missing required logos before enabling the pack.
+  - Recognisable enough for normal players, not just technically available.
 
-### Runtime
+### Candidate Pack Backlog
 
-- [x] Add Supabase Storage URL helpers in `src/ui/screens.js`.
-- [x] Enable `logoStorageEnabled` after upload verification.
-- [x] Keep readable fallback if a stored logo fails.
-- [x] Add Logo Health tab to admin.
-  - It reads `logo_game.logo_assets` and will populate after the upload script runs with `SUPABASE_SERVICE_ROLE_KEY`.
+- [ ] Tech & Car
+  - Priority pack 1.
+  - Composite scope: major tech companies, SaaS/productivity, AI, cybersecurity, social platforms, streaming, gaming, telecoms, electronics, car manufacturers, EV brands, mobility, and automotive services.
+  - Rationale: the current General pool already contains a strong base of tech and automotive logos, and Logo.dev has enough related public categories to support a 100-logo curated composite if the candidate list is reviewed properly.
+  - Acceptance gate: at least 100 recognisable verified logos, with duplicate parent/sub-brand conflicts removed.
+- [ ] Fashion & Finance
+  - Priority pack 2.
+  - Composite scope: fashion, luxury, sportswear, beauty, retail lifestyle brands, banks, payment networks, fintech, investing, accounting, insurance, and trading brands.
+  - Rationale: combining the two categories should make the 100-logo threshold more realistic while keeping the pack broad enough for normal players.
+  - Acceptance gate: at least 100 recognisable verified logos, with UK/global balance and no weak financial or fashion sub-brands that players are unlikely to know.
+- [ ] Food, Drink & Restaurants
+  - Later candidate.
+  - Possible but not guaranteed from Logo.dev public categories alone.
+  - Would need global restaurants, fast food, beverages, snacks, supermarkets, delivery apps, and food manufacturers.
+- [ ] Sport, Media & Entertainment
+  - Later candidate.
+  - Possible, but requires a recognisability review because team, league, college, streaming, gaming, and media logos vary heavily by region.
+
+### Pack Creation Process
+
+- [ ] Create the Tech & Car candidate domain list first.
+- [ ] Create the Fashion & Finance candidate domain list second.
+- [ ] Build and release one pack at a time.
+- [ ] Run logo.dev/Supabase sync in dry-run mode first.
+- [ ] Reject weak candidates before upload:
+  - missing logo,
+  - generic placeholder,
+  - low recognisability,
+  - duplicate parent/sub-brand confusion,
+  - ambiguous logo/name pair.
+- [ ] Upload verified assets to Supabase Storage.
+- [ ] Upsert `logo_game.logo_assets`.
+- [ ] Add source data file under `src/data/`.
+- [ ] Register pack in shared pack config.
+- [ ] Update server Edge Function pack allowlist.
+- [ ] Add tests for pack size, duplicate domains, question generation, storage support, and UI selector visibility.
+- [ ] Play-test desktop/mobile before push.
+
+## Planned Workstream: Admin Experience Upgrade
+
+Goal: decide whether `/admin.html` is only "functional" or should become a sharper operations dashboard for managing growth.
+
+### Current Assessment
+
+- [ ] Treat the current admin page as V2 functional analytics, not the final best possible interface.
+  - It has the right datasets and controls.
+  - The visual hierarchy is still basic: metric cards, filter controls, tabs, and tables are serviceable but not yet a polished analytics product.
+
+### Visual/UX Improvements
+
+- [ ] Add stronger dashboard hierarchy:
+  - primary KPI row,
+  - trend/change indicators,
+  - compact secondary metrics,
+  - clearer "what needs attention" area.
+- [ ] Add useful charts where they answer real questions:
+  - plays over time,
+  - completion rate over time,
+  - average score by pack,
+  - wrong-rate distribution,
+  - slowest/most failed logos.
+- [ ] Improve Logo Health into an operational review tool:
+  - logo thumbnails,
+  - status chips,
+  - pack/category filters,
+  - missing/needs-review priority,
+  - last verified date,
+  - quick visual scan for broken or poor logos.
+- [ ] Improve Question Insights:
+  - thumbnail/logo preview,
+  - attempts threshold,
+  - difficulty score,
+  - most confused-with pair,
+  - "needs distractor review" flag.
+- [ ] Improve player analytics:
+  - returning vs new players,
+  - best score trend,
+  - average session duration,
+  - device/player identity clarity.
+- [ ] Add date filtering once enough play data exists.
+- [ ] Add CSV export for admin tables.
+
+### Technical Improvements
+
+- [ ] Move pack metadata into one shared config so game UI, admin UI, tests, sync script, and Edge Functions do not drift.
+- [ ] Add admin response shape tests where possible.
+- [ ] Add client-side rendering tests for admin tabs if the app gains a browser-test harness.
+- [ ] Consider a simple charting dependency only if it keeps the admin page maintainable.
 
 ## Future Expansion Ideas
 
-- [ ] Add more curated packs once logo storage and admin maintenance are stable.
-- [ ] Add logo review workflow in admin.
-- [ ] Add exportable CSV reports for admin tables.
-- [ ] Add date filters once enough play data exists.
-- [ ] Consider a weekly/monthly leaderboard later.
+- [ ] Add weekly/monthly leaderboard once there is enough repeat play.
+- [ ] Add streaks or badges if they do not compromise the simple quiz flow.
+- [ ] Add a logo review workflow in admin.
+- [ ] Add category difficulty tuning once question analytics has enough data.
+- [ ] Add archive/disable flag for low-quality logos without deleting historical analytics.
 
 ## Data Flow Target
 
@@ -228,13 +334,14 @@ Goal: stop relying on live logo.dev requests during gameplay and serve verified 
 flowchart LR
   PlayerBrowser[Player Browser] --> StartFn[logo-game-start]
   StartFn --> Sessions[(logo_game.sessions)]
+  StartFn --> LogoRegistry[(logo_game.logo_assets)]
   PlayerBrowser --> SubmitFn[logo-game-submit]
   SubmitFn --> Plays[(logo_game.plays)]
   SubmitFn --> PlayAnswers[(logo_game.play_answers)]
   AdminBrowser[Admin Browser] --> AdminFn[logo-game-admin]
   AdminFn --> Plays
   AdminFn --> PlayAnswers
-  AdminFn --> LogoAssets[(logo_game.logo_assets)]
+  AdminFn --> LogoRegistry
   PlayerBrowser --> StorageCdn[Supabase Storage CDN]
   StorageCdn --> LogoBucket[(logo-game-logos bucket)]
 ```
@@ -243,7 +350,8 @@ flowchart LR
 
 Before implementation resumes:
 
-1. Confirm whether to commit the current local logo/timer/avatar fixes first.
-2. Confirm admin analytics redesign details.
-3. Confirm no push until explicit approval.
-4. Execute work in small phases with tests and smoke checks at each checkpoint.
+1. Live-test Mix Brands and Travel & Adventure on desktop and mobile.
+2. Confirm whether General should be renamed to All Logos.
+3. Curate Tech & Car as the first new 100+ logo pack.
+4. Decide whether admin V3 should be a visual polish pass, a charting/data pass, or both.
+5. Confirm no push until explicit approval.

@@ -4,8 +4,14 @@ import { LOGO_POOL }  from '../data/brands.js'
 import { TRAVEL_POOL } from '../data/travel.js'
 import { shuffle }    from '../utils/helpers.js'
 
+function dedupeByDomain(items) {
+  return [...new Map(items.map(item => [item.domain, item])).values()]
+}
+
+export const ALL_LOGO_POOL = dedupeByDomain([...LOGO_POOL, ...TRAVEL_POOL])
+
 export const PACK_POOLS = {
-  brands: LOGO_POOL,
+  brands: ALL_LOGO_POOL,
   travel: TRAVEL_POOL,
 }
 
