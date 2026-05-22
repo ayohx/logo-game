@@ -123,6 +123,7 @@ async function fetchAdminAnalytics(password, overrides = {}) {
       sortBy,
       sortDir,
       pack: document.getElementById('admin-pack-filter')?.value || 'all',
+      dateRange: document.getElementById('admin-date-filter')?.value || 'all',
       search: document.getElementById('admin-search')?.value || '',
       ...overrides,
       sortBy: overrides.sortBy || sortBy || config.sortBy,
@@ -165,6 +166,16 @@ function formatPack(value = '') {
     'fashion-finance': 'Fashion & Finance',
   }
   return labels[value] || value || 'Mix Brands'
+}
+
+function formatDateRange(value = 'all') {
+  const labels = {
+    all: 'All time',
+    today: 'Today',
+    '7d': 'Last 7 days',
+    '30d': 'Last 30 days',
+  }
+  return labels[value] || labels.all
 }
 
 function avatar(row) {
@@ -236,6 +247,7 @@ function renderTable(rows, emptyText) {
 
 function renderOverviewRows(totals = {}) {
   return [
+    { metric: 'Date range', value: formatDateRange(totals.date_range) },
     { metric: 'Completion rate', value: formatPercent(totals.completion_rate) },
     { metric: 'Average score', value: `${totals.avg_score ?? 0}/50` },
     { metric: 'Average correct answers', value: `${totals.avg_correct ?? 0}/10` },
@@ -312,6 +324,7 @@ document.querySelectorAll('.admin-tab').forEach(button => {
 })
 
 document.getElementById('admin-pack-filter')?.addEventListener('change', () => { page = 0; loadAdmin() })
+document.getElementById('admin-date-filter')?.addEventListener('change', () => { page = 0; loadAdmin() })
 document.getElementById('admin-page-size')?.addEventListener('change', event => {
   pageSize = Number(event.target.value) || 20
   page = 0

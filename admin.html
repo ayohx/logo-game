@@ -45,6 +45,15 @@
           </select>
         </label>
         <label>
+          Date range
+          <select id="admin-date-filter">
+            <option value="all" selected>All time</option>
+            <option value="today">Today</option>
+            <option value="7d">Last 7 days</option>
+            <option value="30d">Last 30 days</option>
+          </select>
+        </label>
+        <label>
           Search
           <input id="admin-search" type="search" placeholder="Player or device ID" />
         </label>
@@ -81,6 +90,6 @@
       </section>
     </section>
   </main>
-  <script type="module" src="src/admin.js?v=20260522-category-performance"></script>
+  <script type="module" src="src/admin.js?v=20260522-admin-date-filter"></script>
 </body>
 </html>

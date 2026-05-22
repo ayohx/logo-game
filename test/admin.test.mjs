@@ -32,6 +32,7 @@ test('admin page has tabbed analytics sections and table controls', () => {
     'admin-tab-questions',
     'admin-tab-logo-health',
     'admin-pack-filter',
+    'admin-date-filter',
     'admin-search',
     'admin-page-size',
   ].forEach(id => {
@@ -54,11 +55,28 @@ test('admin client supports paged, sorted, filtered tab data', () => {
   assert.ok(src.includes('sortBy'), 'admin sorting state missing')
   assert.ok(src.includes('pageSize'), 'admin page size state missing')
   assert.ok(src.includes('admin-pack-filter'), 'pack filter wiring missing')
+  assert.ok(src.includes('admin-date-filter'), 'date range filter wiring missing')
+  assert.ok(src.includes('dateRange'), 'admin request should send the selected date range')
   assert.ok(src.includes('admin-search'), 'search wiring missing')
   assert.ok(src.includes('renderPagination'), 'pagination rendering missing')
   assert.ok(src.includes('categoryPerformance'), 'category performance tab missing')
   assert.ok(src.includes('questionInsights'), 'question insights tab missing')
   assert.ok(src.includes('logoHealth'), 'logo health tab missing')
+})
+
+test('admin date filter exposes useful preset ranges', () => {
+  const html = read('admin.html')
+  const src = read('src/admin.js')
+
+  ;[
+    'value="all"',
+    'value="today"',
+    'value="7d"',
+    'value="30d"',
+  ].forEach(option => {
+    assert.ok(html.includes(option), `${option} date option missing`)
+  })
+  assert.ok(src.includes('formatDateRange'), 'admin should render a readable date range label')
 })
 
 test('admin client surfaces category popularity and performance metrics', () => {

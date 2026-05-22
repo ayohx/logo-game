@@ -315,7 +315,10 @@ Goal: decide whether `/admin.html` is only "functional" or should become a sharp
   - category table showing plays, completion rate, average score, average correct count, average answer speed, and timeout/wrong-rate,
   - player/leaderboard table column for strongest category,
   - clear labels so "most played" does not get confused with "best performing".
-- [ ] Add date filtering once enough play data exists.
+- [x] Add date filtering once enough play data exists.
+  - Add Today, Last 7 days, Last 30 days, and All time controls.
+  - Apply the range to overview, recent plays, category performance, player stats, leaderboard where relevant, question insights, and logo-health verification dates.
+  - Keep date filtering visibly separate from pack and search filters.
 - [ ] Add CSV export for admin tables.
 
 ### Technical Improvements
