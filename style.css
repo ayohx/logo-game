@@ -229,6 +229,23 @@ body {
   letter-spacing: 0.05em;
 }
 
+.hud-pack {
+  max-width: min(36vw, 240px);
+  padding: 7px 12px;
+  border: 1px solid rgba(124,106,240,0.5);
+  border-radius: 999px;
+  background: linear-gradient(135deg, rgba(124,106,240,0.28), rgba(0,224,255,0.12));
+  color: var(--text);
+  font-size: 0.82rem;
+  font-weight: 800;
+  line-height: 1;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  box-shadow: 0 8px 22px rgba(124,106,240,0.16);
+}
+
 .hud-score {
   display: flex;
   flex-direction: column;
@@ -1232,6 +1249,10 @@ details[open] .hs-arrow { transform: rotate(90deg); }
 /* ──────────────────────────────────────────────────────────────────────── */
 @media (max-width: 380px) {
   .game-title { font-size: 2.2rem; }
+  .hud { gap: 6px; padding-inline: 10px; }
+  .q-counter { font-size: 0.68rem; }
+  .hud-pack { max-width: 34vw; padding: 6px 8px; font-size: 0.68rem; }
+  .score-value { font-size: 1.25rem; }
   .pack-selector { grid-template-columns: 1fr; }
   .options-logo .option-card { width: calc(33.333% - 6px); min-width: 86px; }
   .br-row { grid-template-columns: 24px 24px 1fr 20px 38px 28px; gap: 5px; padding: 8px 10px; }
@@ -1254,6 +1275,7 @@ details[open] .hs-arrow { transform: rotate(90deg); }
 
 @media (max-height: 720px) {
   .hud { padding: 10px 14px 8px; }
+  .hud-pack { max-width: 32vw; padding: 6px 9px; font-size: 0.72rem; }
   .question-stage { gap: 7px; padding: 10px 12px 12px; }
   .prompt { min-height: 82px; }
   .prompt-logo { width: min(92px, 28vw); height: min(92px, 28vw); }

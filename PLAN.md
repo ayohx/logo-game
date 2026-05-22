@@ -37,7 +37,7 @@ This document is the source of truth for what has been planned, what has shipped
 
 1. Live play-test the deployed game.
    - Desktop and mobile.
-   - Mix Brands and Travel & Adventure.
+   - Mix Brands, Travel & Adventure, Tech & Car, and Fashion & Finance.
    - Confirm logo loading speed, no blank-logo countdowns, result submission, leaderboard behaviour, and admin analytics updates.
 2. Upgrade the admin experience.
    - Improve visual hierarchy, charts, Logo Health, Question Insights, player analytics, date filtering, and CSV export.
@@ -257,6 +257,16 @@ Goal: add more category packs only when each pack can provide at least 100 recog
 - [x] Add tests for pack size, duplicate domains, question generation, storage support, and UI selector visibility.
 - [x] Smoke-test live start-game API before push.
 
+## Completed Workstream: Required Category Selection And Gameplay Reminder
+
+Goal: make category choice deliberate now that the game has multiple packs, and keep the selected category visible during play.
+
+- [x] Disable Start Game until the player chooses a category.
+- [x] Remove the default selected category from the start screen.
+- [x] Show the selected category as a compact prominent badge in the gameplay HUD.
+- [x] Keep the reminder responsive for small mobile screens.
+- [x] Add tests for the disabled start state and gameplay HUD category badge.
+
 ## Planned Workstream: Admin Experience Upgrade
 
 Goal: decide whether `/admin.html` is only "functional" or should become a sharper operations dashboard for managing growth.
@@ -278,6 +288,7 @@ Goal: decide whether `/admin.html` is only "functional" or should become a sharp
   - plays over time,
   - completion rate over time,
   - average score by pack,
+  - category popularity vs performance,
   - wrong-rate distribution,
   - slowest/most failed logos.
 - [ ] Improve Logo Health into an operational review tool:
@@ -297,7 +308,13 @@ Goal: decide whether `/admin.html` is only "functional" or should become a sharp
   - returning vs new players,
   - best score trend,
   - average session duration,
+  - each player's strongest category,
   - device/player identity clarity.
+- [ ] Add category performance metrics across admin:
+  - overview cards for most played category and best-performing category,
+  - category table showing plays, completion rate, average score, average correct count, average answer speed, and timeout/wrong-rate,
+  - player/leaderboard table column for strongest category,
+  - clear labels so "most played" does not get confused with "best performing".
 - [ ] Add date filtering once enough play data exists.
 - [ ] Add CSV export for admin tables.
 

@@ -48,7 +48,7 @@ export async function startGame(pack, playerName = '') {
   LOG.event('game_start', { pack: state.pack, questions: state.questions.length })
   LOG.startSession(state.pack)
 
-  updateHUD(state.current, state.score, CONFIG.questionsPerGame)
+  updateHUD(state.current, state.score, CONFIG.questionsPerGame, state.pack)
   showScreen('game')
   setTimeout(nextQuestion, 250)
 }
@@ -186,7 +186,7 @@ async function showQuestion(q) {
   state.answering = true
   startTimer(q, timeOut)
   SPEECH.listen(q, handleAnswer)
-  updateHUD(state.current, state.score, CONFIG.questionsPerGame)
+  updateHUD(state.current, state.score, CONFIG.questionsPerGame, state.pack)
   focusFirstOption()
 }
 
@@ -299,7 +299,7 @@ function revealAnswer(q, chosenIdx, points, secsUsed) {
     chosen:       chosenIdx >= 0 ? q.options[chosenIdx] : null,
   })
 
-  updateHUD(state.current, state.score, CONFIG.questionsPerGame)
+  updateHUD(state.current, state.score, CONFIG.questionsPerGame, state.pack)
   setTimeout(() => { state.current++; nextQuestion() }, CONFIG.revealDuration)
 }
 

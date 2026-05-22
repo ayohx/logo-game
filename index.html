@@ -7,7 +7,7 @@
   <meta name="description" content="Logo Quiz — Brands &amp; Characters" />
   <title>Logo Quiz</title>
   <link rel="icon" type="image/svg+xml" href="favicon.svg" />
-  <link rel="stylesheet" href="style.css?v=20260522-new-packs" />
+  <link rel="stylesheet" href="style.css?v=20260522-category-required" />
 </head>
 <body>
 <div id="app">
@@ -45,7 +45,7 @@
 
       <!-- Pack selector -->
       <div class="pack-selector">
-        <button class="pack-card is-selected" id="btn-brands" type="button" aria-pressed="true">
+        <button class="pack-card" id="btn-brands" type="button" aria-pressed="false">
           <span class="pack-icon">🌍</span>
           <span class="pack-name">Mix Brands</span>
           <span class="pack-desc">Logos from global &amp; UK favourites — tech, food, fashion &amp; more</span>
@@ -66,8 +66,8 @@
           <span class="pack-desc">100 fashion, beauty, banking, payments, investing &amp; insurance logos</span>
         </button>
       </div>
-      <p class="selected-pack" id="selected-pack">Mix Brands is selected. Enter your profile, then start the game.</p>
-      <button class="btn btn-primary btn-xl" id="btn-start-game" type="button">Start Game</button>
+      <p class="selected-pack" id="selected-pack">Choose a category to unlock Start Game.</p>
+      <button class="btn btn-primary btn-xl" id="btn-start-game" type="button" disabled>Start Game</button>
 
       <button class="btn btn-ghost btn-sm" id="btn-history">View History</button>
       <button class="btn btn-ghost btn-sm" id="btn-leaderboard">Shared Leaderboard</button>
@@ -102,6 +102,7 @@
     <!-- HUD -->
     <div class="hud">
       <span class="q-counter" id="q-counter">Q 1 / 10</span>
+      <span class="hud-pack" id="hud-pack-label" aria-live="polite">Choose category</span>
 
       <div class="hud-score">
         <div class="score-value" id="score-display">0</div>
@@ -223,6 +224,6 @@
 
 </div>
 <!-- Single ES-module entry point — no globals, no load-order dependencies -->
-<script type="module" src="src/main.js?v=20260522-new-packs"></script>
+<script type="module" src="src/main.js?v=20260522-category-required"></script>
 </body>
 </html>

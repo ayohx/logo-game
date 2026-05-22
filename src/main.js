@@ -13,7 +13,7 @@ const profileAvatarInput = $('profile-avatar')
 const nameHelp = $('name-help')
 let activeProfile = getPlayerProfile()
 let selectedEmoji = activeProfile.avatarType === 'emoji' ? emojiFromAvatarValue(activeProfile.avatarValue) : ''
-let selectedPack = 'brands'
+let selectedPack = ''
 
 const PACK_LABELS = {
   brands: 'Mix Brands',
@@ -107,10 +107,32 @@ function selectPack(pack) {
     button?.setAttribute('aria-pressed', String(buttonPack === selectedPack))
   })
   $('selected-pack').textContent = `${PACK_LABELS[selectedPack]} is selected. Press Start Game when you are ready.`
+  syncStartButtonState()
   initLogoParade(selectedPack)
 }
 
+function clearPackSelection() {
+  selectedPack = ''
+  Object.values(PACK_BUTTONS).forEach(button => {
+    button?.classList.remove('is-selected')
+    button?.setAttribute('aria-pressed', 'false')
+  })
+  $('selected-pack').textContent = 'Choose a category to unlock Start Game.'
+  syncStartButtonState()
+  initLogoParade()
+}
+
+function syncStartButtonState() {
+  const startButton = $('btn-start-game')
+  if (startButton) startButton.disabled = !selectedPack
+}
+
 async function startSelectedGame() {
+  if (!selectedPack) {
+    $('selected-pack').textContent = 'Please choose a category first.'
+    return
+  }
+
   const profile = getProfileFromForm()
   if (profile.displayName.length < 2) {
     if (nameHelp) nameHelp.textContent = 'Please enter at least 2 letters or numbers before playing.'
@@ -154,11 +176,13 @@ $('btn-play-again').addEventListener('click', () => {
 
 $('btn-switch-pack').addEventListener('click', () => {
   showScreen('start')
+  clearPackSelection()
   updateBestScore()
 })
 
 $('btn-home').addEventListener('click', () => {
   showScreen('start')
+  clearPackSelection()
   updateBestScore()
 })
 
@@ -296,5 +320,6 @@ document.addEventListener('keydown', e => {
 
 // ── Boot ──────────────────────────────────────────────────────────────────────
 initLogoParade()
+syncStartButtonState()
 updateBestScore()
 if (new URLSearchParams(window.location.search).has('player')) renderLeaderboard()

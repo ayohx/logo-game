@@ -77,6 +77,29 @@ test('start screen exposes all category pack selections', () => {
   assert.ok(main.includes('PACK_BUTTONS'), 'shared pack handlers missing')
 })
 
+test('start game is disabled until a category is selected', () => {
+  const html = read('index.html')
+  const main = read('src/main.js')
+
+  assert.match(html, /id="btn-start-game"[^>]*disabled/, 'Start Game should be disabled before category selection')
+  assert.ok(!html.includes('pack-card is-selected'), 'no pack should be pre-selected now that categories are required')
+  assert.ok(main.includes("let selectedPack = ''"), 'selected pack should start empty')
+  assert.ok(main.includes('syncStartButtonState'), 'main should enable Start Game after pack selection')
+})
+
+test('gameplay HUD shows the selected category as a compact reminder', () => {
+  const html = read('index.html')
+  const screens = read('src/ui/screens.js')
+  const engine = read('src/game/engine.js')
+  const css = read('style.css')
+
+  assert.ok(html.includes('id="hud-pack-label"'), 'gameplay category badge missing from HUD')
+  assert.ok(screens.includes('PACK_LABELS'), 'screen helpers should map pack slugs to readable labels')
+  assert.ok(screens.includes('hud-pack-label'), 'HUD update should write the category label')
+  assert.ok(engine.includes('updateHUD(state.current, state.score, CONFIG.questionsPerGame, state.pack)'), 'game should pass selected pack into HUD')
+  assert.ok(css.includes('.hud-pack'), 'category badge styles missing')
+})
+
 test('shuffle animation avoids extra random logo.dev image cycling', () => {
   const src = read('src/ui/shuffle.js')
 

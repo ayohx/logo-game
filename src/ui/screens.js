@@ -3,6 +3,12 @@ import { CONFIG } from '../config.js'
 
 export const LOGO_ASSET_VERSION = 'v1'
 export const LOGO_STORAGE_BASE = 'https://xbcwbzsgvmerkbnnplep.supabase.co/storage/v1/object/public/logo-game-logos'
+export const PACK_LABELS = {
+  brands: 'Mix Brands',
+  travel: 'Travel & Adventure',
+  'tech-car': 'Tech & Car',
+  'fashion-finance': 'Fashion & Finance',
+}
 
 export function $(id) {
   return document.getElementById(id)
@@ -48,7 +54,8 @@ export function showScorePop(points) {
   setTimeout(() => el.remove(), 900)
 }
 
-export function updateHUD(current, score, questionsPerGame) {
+export function updateHUD(current, score, questionsPerGame, pack = 'brands') {
   $('q-counter').textContent     = `Q ${Math.min(current + 1, questionsPerGame)} / ${questionsPerGame}`
   $('score-display').textContent = score
+  $('hud-pack-label').textContent = PACK_LABELS[pack] || 'Mix Brands'
 }
