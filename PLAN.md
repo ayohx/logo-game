@@ -174,12 +174,12 @@ Goal: stop relying on live logo.dev requests during gameplay and serve verified 
 
 - [x] Create public Supabase Storage bucket.
   - Proposed bucket: `logo-game-logos`
-- [ ] Store versioned assets.
+- [x] Store versioned assets.
   - Example paths:
     - `v1/apple.com.png`
     - `v1/holidayextras.com.png`
     - `v1/britishairways.com.png`
-- [ ] Use public CDN URLs for gameplay.
+- [x] Use public CDN URLs for gameplay.
   - Supabase docs confirm public Storage buckets are CDN-backed and should have high cache-hit rates after first load.
 
 ### Metadata
@@ -200,16 +200,16 @@ Goal: stop relying on live logo.dev requests during gameplay and serve verified 
 - [x] Download each logo from logo.dev once.
 - [x] Validate image responses.
 - [x] Save a review manifest.
-- [ ] Upload verified files to Supabase Storage.
-  - Blocked in this environment because `SUPABASE_SERVICE_ROLE_KEY` is not available.
-- [ ] Upsert `logo_game.logo_assets`.
-  - Script support exists; full upsert depends on the upload credential.
+- [x] Upload verified files to Supabase Storage.
+  - 230/230 assets uploaded and verified.
+- [x] Upsert `logo_game.logo_assets`.
+  - 230/230 registry rows written.
 - [x] Use environment variables only for credentials.
 
 ### Runtime
 
 - [x] Add Supabase Storage URL helpers in `src/ui/screens.js`.
-- [x] Keep `logoStorageEnabled: false` until upload is verified, so live UX does not slow down on empty storage.
+- [x] Enable `logoStorageEnabled` after upload verification.
 - [x] Keep readable fallback if a stored logo fails.
 - [x] Add Logo Health tab to admin.
   - It reads `logo_game.logo_assets` and will populate after the upload script runs with `SUPABASE_SERVICE_ROLE_KEY`.

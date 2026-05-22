@@ -25,6 +25,14 @@ test('logo helper supports Supabase Storage and keeps logo.dev fallback', () => 
   assert.ok(config.includes('logoStorageEnabled'), 'storage switch should be explicit to protect UX before upload')
 })
 
+test('Supabase Storage logo source is enabled after verified upload', () => {
+  const config = read('src/config.js')
+  const html = read('index.html')
+
+  assert.ok(config.includes('logoStorageEnabled: true'), 'Supabase Storage should be enabled after all logos are verified')
+  assert.ok(html.includes('logo-storage-enabled'), 'entry module cache buster should force browsers to pick up storage config')
+})
+
 test('game image error handlers retry logo.dev after storage miss before showing text fallback', () => {
   const src = read('src/game/engine.js')
 
