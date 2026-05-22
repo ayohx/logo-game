@@ -284,6 +284,10 @@ Goal: decide whether `/admin.html` is only "functional" or should become a sharp
   - trend/change indicators,
   - compact secondary metrics,
   - clearer "what needs attention" area.
+- [x] Improve admin filter layout:
+  - keep Pack, Date range, Search, and Rows on one desktop row,
+  - use a tidy two-column tablet layout,
+  - stack controls cleanly on narrow mobile screens.
 - [ ] Add useful charts where they answer real questions:
   - plays over time,
   - completion rate over time,
@@ -334,6 +338,9 @@ Goal: decide whether `/admin.html` is only "functional" or should become a sharp
 - [ ] Add streaks or badges if they do not compromise the simple quiz flow.
 - [ ] Add a logo review workflow in admin.
 - [ ] Add category difficulty tuning once question analytics has enough data.
+  - Consider a simple Normal/Hard mode first.
+  - Possible Hard mode: shorter timer, more similar distractors, and separate admin reporting.
+  - Decide whether difficulty shares the same leaderboard or gets a separate leaderboard before implementation.
 - [ ] Add archive/disable flag for low-quality logos without deleting historical analytics.
 
 ## Data Flow Target

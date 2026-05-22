@@ -98,3 +98,15 @@ test('admin styles include dashboard table and stats layouts', () => {
   assert.ok(css.includes('.admin-tabs'), 'admin tab styles missing')
   assert.ok(css.includes('.admin-controls'), 'admin controls styles missing')
 })
+
+test('admin filters stay on one desktop row and collapse cleanly on mobile', () => {
+  const css = read('style.css')
+
+  assert.match(
+    css,
+    /\.admin-controls\s*\{[^}]*grid-template-columns:\s*minmax\(150px,\s*180px\)\s+minmax\(170px,\s*210px\)\s+minmax\(240px,\s*1fr\)\s+minmax\(96px,\s*120px\)/s,
+    'admin filters should use a four-column desktop layout'
+  )
+  assert.ok(css.includes('@media (max-width: 900px)'), 'tablet admin filter layout breakpoint missing')
+  assert.ok(css.includes('@media (max-width: 560px)'), 'mobile admin filter layout breakpoint missing')
+})

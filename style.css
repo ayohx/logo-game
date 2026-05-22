@@ -1445,7 +1445,7 @@ details[open] .hs-arrow { transform: rotate(90deg); }
 
 .admin-controls {
   display: grid;
-  grid-template-columns: 180px minmax(180px, 1fr) 120px;
+  grid-template-columns: minmax(150px, 180px) minmax(170px, 210px) minmax(240px, 1fr) minmax(96px, 120px);
   gap: 12px;
   align-items: end;
 }
@@ -1567,8 +1567,17 @@ details[open] .hs-arrow { transform: rotate(90deg); }
   font-size: 0.78rem;
 }
 
-@media (max-width: 760px) {
+@media (max-width: 900px) {
+  .admin-controls { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .admin-controls label:nth-child(3) { grid-column: 1 / -1; }
+}
+
+@media (max-width: 560px) {
   .admin-controls { grid-template-columns: 1fr; }
+  .admin-controls label:nth-child(3) { grid-column: auto; }
+}
+
+@media (max-width: 760px) {
   .admin-grid { grid-template-columns: 1fr; }
   .admin-login-row,
   .admin-header,
