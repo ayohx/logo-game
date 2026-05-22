@@ -1,4 +1,5 @@
 const FUNCTION_BASE = 'https://xbcwbzsgvmerkbnnplep.supabase.co/functions/v1'
+const LOGO_STORAGE_BASE = 'https://xbcwbzsgvmerkbnnplep.supabase.co/storage/v1/object/public/logo-game-logos/v1'
 
 const passwordInput = document.getElementById('admin-password')
 const loginButton = document.getElementById('btn-admin-login')
@@ -87,9 +88,12 @@ const tabConfig = {
     summary: 'Logo-level difficulty based on answer history, wrong rate, and average speed.',
     sortBy: 'wrong_rate',
     columns: [
+      ['question_logo', 'Preview'],
       ['correct_name', 'Logo'],
       ['pack', 'Pack'],
       ['attempts', 'Attempts'],
+      ['difficulty_label', 'Difficulty'],
+      ['needs_review', 'Needs review'],
       ['wrong_rate', 'Wrong rate'],
       ['timeout_rate', 'Timeout rate'],
       ['avg_time', 'Avg. answer'],
@@ -179,8 +183,29 @@ function formatDateRange(value = 'all') {
   return labels[value] || labels.all
 }
 
+function logoStorageUrl(domain = '') {
+  return `${LOGO_STORAGE_BASE}/${domain}.png`
+}
+
 function avatar(row) {
   return `<span class="leaderboard-avatar admin-avatar">${row.avatar_value || row.avatarValue || '?'}</span>`
+}
+
+function questionDifficulty(row = {}) {
+  const wrongRate = Number(row.wrong_rate) || 0
+  const timeoutRate = Number(row.timeout_rate) || 0
+  const avgTime = Number(row.avg_time) || 0
+  const score = wrongRate + timeoutRate + (avgTime >= 4.5 ? 20 : avgTime >= 3.2 ? 10 : 0)
+  if (score >= 85) return { label: 'Review', className: 'is-review' }
+  if (score >= 55) return { label: 'Hard', className: 'is-hard' }
+  if (score >= 25) return { label: 'Medium', className: 'is-medium' }
+  return { label: 'Easy', className: 'is-easy' }
+}
+
+function needsQuestionReview(row = {}) {
+  const attempts = Number(row.attempts) || 0
+  if (attempts < 3) return false
+  return questionDifficulty(row).label === 'Review' || Number(row.wrong_rate) >= 70 || Number(row.timeout_rate) >= 35
 }
 
 function renderStats(totals) {
@@ -206,6 +231,35 @@ function renderStats(totals) {
 
 function formatCell(key, row) {
   if (key === 'player_name') return `${avatar(row)} ${row.player_name || 'Unknown'}`
+  if (key === 'question_logo') {
+    return `<img class="admin-logo-thumb" src="${logoStorageUrl(row.correct_domain)}" alt="${row.correct_name || 'Logo'}" loading="lazy" />`
+  }
+  if (key === 'difficulty_label') {
+    const difficulty = questionDifficulty(row)
+    return `<span class="admin-chip ${difficulty.className}">${difficulty.label}</span>`
+  }
+  if (key === 'needs_review') {
+    return needsQuestionReview(row)
+      ? '<span class="admin-chip is-review">Yes</span>'
+      : '<span class="admin-chip is-easy">No</span>'
+  }
+  if (key === 'pack' || key === 'strongest_category') return formatPack(row[key])
+  if (key === 'correct_count' || key === 'best_correct' || key === 'avg_correct') return `${row[key] ?? 0}/10`
+  if (key === 'duration_seconds' || key === 'total_duration_seconds') return formatDuration(row[key])
+  if (key === 'avg_time' || key === 'avg_answer_time') return formatAnswerTime(row[key])
+  if (key === 'wrong_rate' || key === 'timeout_rate' || key === 'completion_rate') return formatPercent(row[key])
+  if (key === 'submitted_at' || key === 'last_played_at' || key === 'best_submitted_at' || key === 'verified_at') return formatDate(row[key])
+  if (key === 'common_wrong_choice') return row[key] || 'None yet'
+  if (key === 'packs') return Array.isArray(row[key]) ? row[key].map(formatPack).join(', ') : formatPack(row[key])
+  if (key === 'byte_size') return `${Math.round((Number(row[key]) || 0) / 1024)} KB`
+  return row[key] ?? 0
+}
+
+function formatCsvCell(key, row) {
+  if (key === 'question_logo') return row.correct_name
+  if (key === 'difficulty_label') return questionDifficulty(row).label
+  if (key === 'needs_review') return needsQuestionReview(row) ? 'Yes' : 'No'
+  if (key === 'player_name') return row.player_name || 'Unknown'
   if (key === 'pack' || key === 'strongest_category') return formatPack(row[key])
   if (key === 'correct_count' || key === 'best_correct' || key === 'avg_correct') return `${row[key] ?? 0}/10`
   if (key === 'duration_seconds' || key === 'total_duration_seconds') return formatDuration(row[key])
@@ -267,7 +321,7 @@ function csvEscape(value) {
 
 function toCsv(rows, columns) {
   const header = columns.map(([, label]) => csvEscape(label)).join(',')
-  const body = rows.map(row => columns.map(([key]) => csvEscape(formatCell(key, row))).join(',')).join('\n')
+  const body = rows.map(row => columns.map(([key]) => csvEscape(formatCsvCell(key, row))).join(',')).join('\n')
   return body ? `${header}\n${body}\n` : `${header}\n`
 }
 

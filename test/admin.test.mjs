@@ -102,6 +102,29 @@ test('admin client surfaces category popularity and performance metrics', () => 
   assert.ok(src.includes('avg_score'), 'category table should include average score')
 })
 
+test('admin question insights show logo thumbnails and review flags', () => {
+  const src = read('src/admin.js')
+  const css = read('style.css')
+
+  assert.ok(src.includes('question_logo'), 'question insights should include a logo thumbnail column')
+  assert.ok(src.includes('difficulty_label'), 'question insights should include a difficulty column')
+  assert.ok(src.includes('needs_review'), 'question insights should include a needs-review flag')
+  assert.ok(src.includes('questionDifficulty'), 'difficulty helper missing')
+  assert.ok(src.includes('needsQuestionReview'), 'needs-review helper missing')
+  assert.ok(src.includes('logoStorageUrl'), 'logo thumbnail helper missing')
+  assert.ok(css.includes('.admin-logo-thumb'), 'admin logo thumbnail styles missing')
+  assert.ok(css.includes('.admin-chip'), 'admin review/difficulty chip styles missing')
+})
+
+test('admin CSV export keeps question insight values plain text', () => {
+  const src = read('src/admin.js')
+
+  assert.ok(src.includes('formatCsvCell'), 'CSV export should use a plain-text cell formatter')
+  assert.ok(src.includes("if (key === 'question_logo') return row.correct_name"), 'CSV logo thumbnail column should export the logo name')
+  assert.ok(src.includes("if (key === 'difficulty_label') return questionDifficulty(row).label"), 'CSV difficulty should export the label')
+  assert.ok(src.includes("if (key === 'needs_review') return needsQuestionReview(row) ? 'Yes' : 'No'"), 'CSV review flag should export Yes/No')
+})
+
 test('admin styles include dashboard table and stats layouts', () => {
   const css = read('style.css')
 

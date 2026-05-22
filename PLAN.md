@@ -302,7 +302,7 @@ Goal: decide whether `/admin.html` is only "functional" or should become a sharp
   - missing/needs-review priority,
   - last verified date,
   - quick visual scan for broken or poor logos.
-- [ ] Improve Question Insights:
+- [x] Improve Question Insights:
   - thumbnail/logo preview,
   - attempts threshold,
   - difficulty score,
