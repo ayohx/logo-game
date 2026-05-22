@@ -45,6 +45,8 @@ test('logo asset sync script documents required environment and uploads verified
 
   assert.ok(src.includes('SUPABASE_SERVICE_ROLE_KEY'), 'service role env requirement missing')
   assert.ok(src.includes('logo-game-logo-assets'), 'private registry Edge Function call missing')
+  assert.ok(src.includes('upsertRegistryBatch'), 'registry writes should be batched to avoid database connection pressure')
+  assert.ok(src.includes('REGISTRY_BATCH_SIZE'), 'registry batch size setting missing')
   assert.ok(src.includes('logo-game-logos'), 'storage bucket name missing')
   assert.ok(src.includes('src/data/brands.js'), 'General logo pool import missing')
   assert.ok(src.includes('src/data/travel.js'), 'Travel logo pool import missing')

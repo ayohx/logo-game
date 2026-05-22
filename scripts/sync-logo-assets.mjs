@@ -13,6 +13,7 @@ const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || ''
 const BUCKET = process.env.LOGO_STORAGE_BUCKET || 'logo-game-logos'
 const VERSION = process.env.LOGO_ASSET_VERSION || 'v1'
 const REGISTRY_FUNCTION = `${SUPABASE_URL}/functions/v1/logo-game-logo-assets`
+const REGISTRY_BATCH_SIZE = Number(process.env.LOGO_REGISTRY_BATCH_SIZE || 25)
 const MANIFEST_PATH = path.join(PROJECT_ROOT, 'logo-assets-manifest.json')
 const DRY_RUN = process.argv.includes('--dry-run')
 const LIMIT = Number(process.argv.find(arg => arg.startsWith('--limit='))?.split('=')[1] || 0)
@@ -94,9 +95,8 @@ async function uploadLogo(asset) {
   }
 }
 
-async function upsertRegistry(asset) {
-  if (!SERVICE_KEY) return
-  const payload = {
+function registryPayload(asset) {
+  return {
     domain: asset.domain,
     name: asset.name,
     packs: asset.packs,
@@ -111,24 +111,35 @@ async function upsertRegistry(asset) {
     verified_at: asset.status === 'verified' ? new Date().toISOString() : null,
     updated_at: new Date().toISOString(),
   }
+}
 
+async function upsertRegistryBatch(assets, attempt = 1) {
+  if (!SERVICE_KEY) return
   const response = await fetch(REGISTRY_FUNCTION, {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${SERVICE_KEY}`,
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify(payload),
+    body: JSON.stringify({ assets: assets.map(registryPayload) }),
   })
 
   if (!response.ok) {
-    throw new Error(`Registry upsert failed for ${asset.domain}: ${response.status} ${await response.text()}`)
+    const body = await response.text()
+    if (attempt < 4 && /connection slots|timeout|temporarily|overloaded/i.test(body)) {
+      const delayMs = 750 * attempt
+      console.log(`Registry batch retry ${attempt} after ${delayMs}ms: ${body}`)
+      await new Promise(resolve => setTimeout(resolve, delayMs))
+      return upsertRegistryBatch(assets, attempt + 1)
+    }
+    throw new Error(`Registry batch upsert failed: ${response.status} ${body}`)
   }
 }
 
 async function main() {
   const assets = buildRegistry()
   const manifest = []
+  const registryQueue = []
 
   console.log(`${DRY_RUN ? 'Dry running' : 'Syncing'} ${assets.length} logo assets to ${BUCKET}/${VERSION}`)
   for (const asset of assets) {
@@ -139,12 +150,21 @@ async function main() {
 
     if (!DRY_RUN && result.status === 'verified') {
       await uploadLogo(result)
-      await upsertRegistry(result)
+      registryQueue.push(result)
     } else if (!DRY_RUN) {
-      await upsertRegistry(result)
+      registryQueue.push(result)
     }
 
     console.log(`${result.status.padEnd(8)} ${result.domain} ${result.byteSize} bytes`)
+  }
+
+  if (!DRY_RUN && registryQueue.length) {
+    console.log(`Writing ${registryQueue.length} registry rows in batches of ${REGISTRY_BATCH_SIZE}`)
+    for (let i = 0; i < registryQueue.length; i += REGISTRY_BATCH_SIZE) {
+      const batch = registryQueue.slice(i, i + REGISTRY_BATCH_SIZE)
+      await upsertRegistryBatch(batch)
+      console.log(`registry ${Math.min(i + batch.length, registryQueue.length)}/${registryQueue.length}`)
+    }
   }
 
   await fs.writeFile(MANIFEST_PATH, `${JSON.stringify({
