@@ -30,7 +30,7 @@ test('Supabase Storage logo source is enabled after verified upload', () => {
   const html = read('index.html')
 
   assert.ok(config.includes('logoStorageEnabled: true'), 'Supabase Storage should be enabled after all logos are verified')
-  assert.ok(html.includes('category-required'), 'entry module cache buster should force browsers to pick up storage config')
+  assert.ok(html.includes('grey-start-disabled'), 'entry module cache buster should force browsers to pick up storage config')
 })
 
 test('game image error handlers retry logo.dev after storage miss before showing text fallback', () => {
