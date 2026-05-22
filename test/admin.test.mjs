@@ -28,6 +28,7 @@ test('admin page has tabbed analytics sections and table controls', () => {
     'admin-tab-recent',
     'admin-tab-players',
     'admin-tab-leaderboard',
+    'admin-tab-categories',
     'admin-tab-questions',
     'admin-tab-logo-health',
     'admin-pack-filter',
@@ -55,8 +56,19 @@ test('admin client supports paged, sorted, filtered tab data', () => {
   assert.ok(src.includes('admin-pack-filter'), 'pack filter wiring missing')
   assert.ok(src.includes('admin-search'), 'search wiring missing')
   assert.ok(src.includes('renderPagination'), 'pagination rendering missing')
+  assert.ok(src.includes('categoryPerformance'), 'category performance tab missing')
   assert.ok(src.includes('questionInsights'), 'question insights tab missing')
   assert.ok(src.includes('logoHealth'), 'logo health tab missing')
+})
+
+test('admin client surfaces category popularity and performance metrics', () => {
+  const src = read('src/admin.js')
+
+  assert.ok(src.includes('Most played category'), 'overview should include most played category')
+  assert.ok(src.includes('Best-performing category'), 'overview should include best-performing category')
+  assert.ok(src.includes('strongest_category'), 'player and leaderboard tables should include strongest category')
+  assert.ok(src.includes('completion_rate'), 'category table should include completion rate')
+  assert.ok(src.includes('avg_score'), 'category table should include average score')
 })
 
 test('admin styles include dashboard table and stats layouts', () => {

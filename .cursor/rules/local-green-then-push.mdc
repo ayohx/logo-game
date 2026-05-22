@@ -1,0 +1,17 @@
+---
+description: Require local red-green verification before pushing changes for user testing
+alwaysApply: true
+---
+
+# Local Green Then Push
+
+When changing app behaviour, bug fixes, UI states, data packs, or admin logic:
+
+- Update `PLAN.md` first when the work changes the roadmap or planned scope.
+- Use test-first development where practical: add or update the focused test, confirm it fails for the expected missing behaviour, then implement the change.
+- Run the focused test and the full local suite (`node --test`) after implementation.
+- Only push to `main` after the local focused and full checks are green.
+- After pushing, verify the live GitHub Pages URL or live Supabase Edge Function when the change affects deployed behaviour.
+- Tell the user what passed locally and whether the live deployment is ready for their online testing.
+
+If a change is documentation-only or cannot reasonably have a failing automated test, say so explicitly and still run the relevant local checks before pushing.

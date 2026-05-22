@@ -310,7 +310,7 @@ Goal: decide whether `/admin.html` is only "functional" or should become a sharp
   - average session duration,
   - each player's strongest category,
   - device/player identity clarity.
-- [ ] Add category performance metrics across admin:
+- [x] Add category performance metrics across admin:
   - overview cards for most played category and best-performing category,
   - category table showing plays, completion rate, average score, average correct count, average answer speed, and timeout/wrong-rate,
   - player/leaderboard table column for strongest category,

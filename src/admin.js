@@ -38,13 +38,14 @@ const tabConfig = {
   },
   playerStats: {
     title: 'Players & Devices',
-    summary: 'Grouped by stable device/player ID, so renamed profiles still stay together.',
+    summary: 'Grouped by stable device/player ID, including each player\'s strongest category.',
     sortBy: 'last_played_at',
     columns: [
       ['player_name', 'Player'],
       ['games_played', 'Games'],
       ['best_score', 'Best'],
       ['avg_score', 'Avg. score'],
+      ['strongest_category', 'Strongest category'],
       ['avg_answer_time', 'Avg. answer'],
       ['total_duration_seconds', 'Total time'],
       ['last_played_at', 'Last played'],
@@ -59,8 +60,25 @@ const tabConfig = {
       ['best_score', 'Best'],
       ['best_correct', 'Correct'],
       ['best_streak', 'Streak'],
+      ['strongest_category', 'Strongest category'],
       ['games_played', 'Games'],
       ['last_played_at', 'Last played'],
+    ],
+  },
+  categoryPerformance: {
+    title: 'Category Performance',
+    summary: 'Popularity and performance by category, separating most played from best scoring.',
+    sortBy: 'games_completed',
+    columns: [
+      ['pack', 'Category'],
+      ['games_started', 'Started'],
+      ['games_completed', 'Completed'],
+      ['completion_rate', 'Completion'],
+      ['avg_score', 'Avg. score'],
+      ['avg_correct', 'Avg. correct'],
+      ['avg_answer_time', 'Avg. answer'],
+      ['wrong_rate', 'Wrong rate'],
+      ['timeout_rate', 'Timeout rate'],
     ],
   },
   questionInsights: {
@@ -176,11 +194,11 @@ function renderStats(totals) {
 
 function formatCell(key, row) {
   if (key === 'player_name') return `${avatar(row)} ${row.player_name || 'Unknown'}`
-  if (key === 'pack') return formatPack(row.pack)
-  if (key === 'correct_count' || key === 'best_correct') return `${row[key] ?? 0}/10`
+  if (key === 'pack' || key === 'strongest_category') return formatPack(row[key])
+  if (key === 'correct_count' || key === 'best_correct' || key === 'avg_correct') return `${row[key] ?? 0}/10`
   if (key === 'duration_seconds' || key === 'total_duration_seconds') return formatDuration(row[key])
   if (key === 'avg_time' || key === 'avg_answer_time') return formatAnswerTime(row[key])
-  if (key === 'wrong_rate' || key === 'timeout_rate') return formatPercent(row[key])
+  if (key === 'wrong_rate' || key === 'timeout_rate' || key === 'completion_rate') return formatPercent(row[key])
   if (key === 'submitted_at' || key === 'last_played_at' || key === 'best_submitted_at' || key === 'verified_at') return formatDate(row[key])
   if (key === 'common_wrong_choice') return row[key] || 'None yet'
   if (key === 'packs') return Array.isArray(row[key]) ? row[key].map(formatPack).join(', ') : formatPack(row[key])
@@ -223,7 +241,8 @@ function renderOverviewRows(totals = {}) {
     { metric: 'Average correct answers', value: `${totals.avg_correct ?? 0}/10` },
     { metric: 'Average answer speed', value: formatAnswerTime(totals.avg_answer_time) },
     { metric: 'Fastest average player', value: totals.fastest_player || 'Not enough data yet' },
-    { metric: 'Most played pack', value: totals.most_played_pack ? formatPack(totals.most_played_pack) : 'Not enough data yet' },
+    { metric: 'Most played category', value: totals.most_played_pack ? formatPack(totals.most_played_pack) : 'Not enough data yet' },
+    { metric: 'Best-performing category', value: totals.best_performing_pack ? `${formatPack(totals.best_performing_pack)} (${totals.best_performing_pack_score ?? 0}/50 avg.)` : 'Not enough data yet' },
     { metric: 'Total timeouts', value: totals.total_timeouts ?? 0 },
   ]
 }
