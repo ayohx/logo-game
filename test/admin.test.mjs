@@ -104,8 +104,8 @@ test('admin filters stay on one desktop row and collapse cleanly on mobile', () 
 
   assert.match(
     css,
-    /\.admin-controls\s*\{[^}]*grid-template-columns:\s*minmax\(150px,\s*180px\)\s+minmax\(170px,\s*210px\)\s+minmax\(240px,\s*1fr\)\s+minmax\(96px,\s*120px\)/s,
-    'admin filters should use a four-column desktop layout'
+    /\.admin-controls\s*\{[^}]*grid-template-columns:\s*minmax\(150px,\s*180px\)\s+minmax\(170px,\s*210px\)\s+minmax\(300px,\s*1fr\)\s+minmax\(96px,\s*120px\)/s,
+    'admin filters should keep Search wider than Date range on desktop'
   )
   assert.ok(css.includes('@media (max-width: 900px)'), 'tablet admin filter layout breakpoint missing')
   assert.ok(css.includes('@media (max-width: 560px)'), 'mobile admin filter layout breakpoint missing')

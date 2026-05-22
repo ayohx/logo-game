@@ -1445,7 +1445,7 @@ details[open] .hs-arrow { transform: rotate(90deg); }
 
 .admin-controls {
   display: grid;
-  grid-template-columns: minmax(150px, 180px) minmax(170px, 210px) minmax(240px, 1fr) minmax(96px, 120px);
+  grid-template-columns: minmax(150px, 180px) minmax(170px, 210px) minmax(300px, 1fr) minmax(96px, 120px);
   gap: 12px;
   align-items: end;
 }
