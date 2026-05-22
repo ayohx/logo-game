@@ -30,7 +30,7 @@ test('Supabase Storage logo source is enabled after verified upload', () => {
   const html = read('index.html')
 
   assert.ok(config.includes('logoStorageEnabled: true'), 'Supabase Storage should be enabled after all logos are verified')
-  assert.ok(html.includes('logo-storage-enabled'), 'entry module cache buster should force browsers to pick up storage config')
+  assert.ok(html.includes('new-packs'), 'entry module cache buster should force browsers to pick up storage config')
 })
 
 test('game image error handlers retry logo.dev after storage miss before showing text fallback', () => {
@@ -55,9 +55,13 @@ test('logo asset sync script documents required environment and uploads verified
   assert.ok(src.includes('logo-game-logo-assets'), 'private registry Edge Function call missing')
   assert.ok(src.includes('upsertRegistryBatch'), 'registry writes should be batched to avoid database connection pressure')
   assert.ok(src.includes('REGISTRY_BATCH_SIZE'), 'registry batch size setting missing')
+  assert.ok(src.includes('PACK_FILTERS'), 'pack-filtered sync should avoid unnecessary logo.dev calls')
+  assert.ok(src.includes('--pack='), 'pack-filtered sync argument missing')
   assert.ok(src.includes('logo-game-logos'), 'storage bucket name missing')
   assert.ok(src.includes('src/data/brands.js'), 'General logo pool import missing')
   assert.ok(src.includes('src/data/travel.js'), 'Travel logo pool import missing')
+  assert.ok(src.includes('src/data/tech-car.js'), 'Tech and Car logo pool import missing')
+  assert.ok(src.includes('src/data/fashion-finance.js'), 'Fashion and Finance logo pool import missing')
   assert.ok(src.includes('REGISTRY_FUNCTION'), 'logo asset registry upsert endpoint missing')
   assert.ok(src.includes('--dry-run'), 'dry run mode missing')
 })

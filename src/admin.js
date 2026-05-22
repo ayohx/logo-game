@@ -140,7 +140,13 @@ function formatPercent(value = 0) {
 }
 
 function formatPack(value = '') {
-  return value === 'travel' ? 'Travel & Adventure' : 'Mix Brands'
+  const labels = {
+    brands: 'Mix Brands',
+    travel: 'Travel & Adventure',
+    'tech-car': 'Tech & Car',
+    'fashion-finance': 'Fashion & Finance',
+  }
+  return labels[value] || value || 'Mix Brands'
 }
 
 function avatar(row) {

@@ -2,17 +2,26 @@
 import { CONFIG }     from '../config.js'
 import { LOGO_POOL }  from '../data/brands.js'
 import { TRAVEL_POOL } from '../data/travel.js'
+import { TECH_CAR_POOL } from '../data/tech-car.js'
+import { FASHION_FINANCE_POOL } from '../data/fashion-finance.js'
 import { shuffle }    from '../utils/helpers.js'
 
 function dedupeByDomain(items) {
   return [...new Map(items.map(item => [item.domain, item])).values()]
 }
 
-export const ALL_LOGO_POOL = dedupeByDomain([...LOGO_POOL, ...TRAVEL_POOL])
+export const ALL_LOGO_POOL = dedupeByDomain([
+  ...LOGO_POOL,
+  ...TRAVEL_POOL,
+  ...TECH_CAR_POOL,
+  ...FASHION_FINANCE_POOL,
+])
 
 export const PACK_POOLS = {
   brands: ALL_LOGO_POOL,
   travel: TRAVEL_POOL,
+  'tech-car': TECH_CAR_POOL,
+  'fashion-finance': FASHION_FINANCE_POOL,
 }
 
 export function getPackPool(pack = 'brands') {

@@ -39,21 +39,9 @@ This document is the source of truth for what has been planned, what has shipped
    - Desktop and mobile.
    - Mix Brands and Travel & Adventure.
    - Confirm logo loading speed, no blank-logo countdowns, result submission, leaderboard behaviour, and admin analytics updates.
-2. Change General/Mix Brands into an all-logo mode. Done locally and deployed to Supabase; pending push.
-   - Use every verified enabled logo from Supabase Storage.
-   - Deduplicate domains across packs.
-   - Keep the public label as Mix Brands for now.
-   - Keep specialist packs as filtered modes.
-3. Build the Tech & Car pack.
-   - Curate at least 100 recognisable domains.
-   - Verify all logos through the storage sync process.
-   - Add source data, shared pack config, server allowlist updates, UI selector support, tests, and live play-testing.
-4. Build the Fashion & Finance pack.
-   - Repeat the same 100-logo process after Tech & Car.
-   - Keep the candidate list recognisable and balanced across UK/global brands.
-5. Upgrade the admin experience.
+2. Upgrade the admin experience.
    - Improve visual hierarchy, charts, Logo Health, Question Insights, player analytics, date filtering, and CSV export.
-6. Keep later expansion ideas parked until the core roadmap above is complete.
+3. Keep later expansion ideas parked until the core roadmap above is complete.
    - Food, Drink & Restaurants.
    - Sport, Media & Entertainment.
    - Weekly/monthly leaderboard.
@@ -174,7 +162,7 @@ Goal: verify that the deployed game feels reliable now that logos are served fro
 - [ ] Confirm Players & Devices updates the current player/device.
 - [ ] Confirm Leaderboard reflects retained best-score rules.
 - [ ] Confirm Question Insights gains new answer rows.
-- [ ] Confirm Logo Health remains 230 verified / 0 missing.
+- [ ] Confirm Logo Health remains 356 verified / 0 missing.
 
 ## Completed Workstream: General Mode Uses All Logos
 
@@ -214,16 +202,16 @@ Goal: make the default General/Mix Brands mode use the full verified logo catalo
 - [x] Keep logo.dev fallback for runtime resilience, not normal loading.
 - [ ] Update sync script so future packs are included without manually editing multiple import lists.
 
-## Planned Workstream: New 100+ Logo Category Packs
+## Completed Workstream: New 100+ Logo Category Packs
 
 Goal: add more category packs only when each pack can provide at least 100 recognisable, verified logos.
 
 ### Logo.dev Discovery Notes
 
-- [ ] Validate against Logo.dev before implementation.
+- [x] Validate against Logo.dev before implementation.
   - The public Logo.dev category directory does not currently show a single category with 100+ brands.
   - The largest visible public categories are below the 100-logo target, so new packs should be curated composites rather than direct one-category imports.
-- [ ] Use the 100-logo gate for every new pack.
+- [x] Use the 100-logo gate for every new pack.
   - At least 100 candidate domains.
   - At least 100 verified Supabase Storage uploads.
   - 0 missing required logos before enabling the pack.
@@ -231,12 +219,12 @@ Goal: add more category packs only when each pack can provide at least 100 recog
 
 ### Candidate Pack Backlog
 
-- [ ] Tech & Car
+- [x] Tech & Car
   - Priority pack 1.
   - Composite scope: major tech companies, SaaS/productivity, AI, cybersecurity, social platforms, streaming, gaming, telecoms, electronics, car manufacturers, EV brands, mobility, and automotive services.
   - Rationale: the current General pool already contains a strong base of tech and automotive logos, and Logo.dev has enough related public categories to support a 100-logo curated composite if the candidate list is reviewed properly.
   - Acceptance gate: at least 100 recognisable verified logos, with duplicate parent/sub-brand conflicts removed.
-- [ ] Fashion & Finance
+- [x] Fashion & Finance
   - Priority pack 2.
   - Composite scope: fashion, luxury, sportswear, beauty, retail lifestyle brands, banks, payment networks, fintech, investing, accounting, insurance, and trading brands.
   - Rationale: combining the two categories should make the 100-logo threshold more realistic while keeping the pack broad enough for normal players.
@@ -251,23 +239,23 @@ Goal: add more category packs only when each pack can provide at least 100 recog
 
 ### Pack Creation Process
 
-- [ ] Create the Tech & Car candidate domain list first.
-- [ ] Create the Fashion & Finance candidate domain list second.
-- [ ] Build and release one pack at a time.
-- [ ] Run logo.dev/Supabase sync in dry-run mode first.
-- [ ] Reject weak candidates before upload:
+- [x] Create the Tech & Car candidate domain list first.
+- [x] Create the Fashion & Finance candidate domain list second.
+- [x] Build and release one pack at a time.
+- [x] Run logo.dev/Supabase sync in dry-run mode first.
+- [x] Reject weak candidates before upload:
   - missing logo,
   - generic placeholder,
   - low recognisability,
   - duplicate parent/sub-brand confusion,
   - ambiguous logo/name pair.
-- [ ] Upload verified assets to Supabase Storage.
-- [ ] Upsert `logo_game.logo_assets`.
-- [ ] Add source data file under `src/data/`.
-- [ ] Register pack in shared pack config.
-- [ ] Update server Edge Function pack allowlist.
-- [ ] Add tests for pack size, duplicate domains, question generation, storage support, and UI selector visibility.
-- [ ] Play-test desktop/mobile before push.
+- [x] Upload verified assets to Supabase Storage.
+- [x] Upsert `logo_game.logo_assets`.
+- [x] Add source data files under `src/data/`.
+- [x] Register packs in shared pack config.
+- [x] Update server Edge Function pack allowlist.
+- [x] Add tests for pack size, duplicate domains, question generation, storage support, and UI selector visibility.
+- [x] Smoke-test live start-game API before push.
 
 ## Planned Workstream: Admin Experience Upgrade
 

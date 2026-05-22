@@ -15,6 +15,20 @@ let activeProfile = getPlayerProfile()
 let selectedEmoji = activeProfile.avatarType === 'emoji' ? emojiFromAvatarValue(activeProfile.avatarValue) : ''
 let selectedPack = 'brands'
 
+const PACK_LABELS = {
+  brands: 'Mix Brands',
+  travel: 'Travel & Adventure',
+  'tech-car': 'Tech & Car',
+  'fashion-finance': 'Fashion & Finance',
+}
+
+const PACK_BUTTONS = {
+  brands: $('btn-brands'),
+  travel: $('btn-travel'),
+  'tech-car': $('btn-tech-car'),
+  'fashion-finance': $('btn-fashion-finance'),
+}
+
 function initialsForName(name) {
   return normalisePlayerName(name).replace(/[^A-Za-z0-9]/g, '').slice(0, 2).toUpperCase() || '??'
 }
@@ -80,20 +94,20 @@ $('btn-save-profile').addEventListener('click', async () => {
   }
 })
 
-$('btn-brands').addEventListener('click', () => selectPack('brands'))
-$('btn-travel').addEventListener('click', () => selectPack('travel'))
+Object.entries(PACK_BUTTONS).forEach(([pack, button]) => {
+  button?.addEventListener('click', () => selectPack(pack))
+})
 
 $('btn-start-game').addEventListener('click', () => startSelectedGame())
 
 function selectPack(pack) {
-  selectedPack = pack
-  const isTravel = pack === 'travel'
-  $('btn-brands').classList.toggle('is-selected', !isTravel)
-  $('btn-travel').classList.toggle('is-selected', isTravel)
-  $('btn-brands').setAttribute('aria-pressed', String(!isTravel))
-  $('btn-travel').setAttribute('aria-pressed', String(isTravel))
-  $('selected-pack').textContent = `${isTravel ? 'Travel & Adventure' : 'Mix Brands'} is selected. Press Start Game when you are ready.`
-  initLogoParade(pack)
+  selectedPack = PACK_LABELS[pack] ? pack : 'brands'
+  Object.entries(PACK_BUTTONS).forEach(([buttonPack, button]) => {
+    button?.classList.toggle('is-selected', buttonPack === selectedPack)
+    button?.setAttribute('aria-pressed', String(buttonPack === selectedPack))
+  })
+  $('selected-pack').textContent = `${PACK_LABELS[selectedPack]} is selected. Press Start Game when you are ready.`
+  initLogoParade(selectedPack)
 }
 
 async function startSelectedGame() {

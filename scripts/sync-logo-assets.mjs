@@ -5,6 +5,8 @@ import { createHash } from 'node:crypto'
 import { fileURLToPath } from 'node:url'
 import { LOGO_POOL } from '../src/data/brands.js'
 import { TRAVEL_POOL } from '../src/data/travel.js'
+import { TECH_CAR_POOL } from '../src/data/tech-car.js'
+import { FASHION_FINANCE_POOL } from '../src/data/fashion-finance.js'
 import { CONFIG } from '../src/config.js'
 
 const PROJECT_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
@@ -17,6 +19,10 @@ const REGISTRY_BATCH_SIZE = Number(process.env.LOGO_REGISTRY_BATCH_SIZE || 25)
 const MANIFEST_PATH = path.join(PROJECT_ROOT, 'logo-assets-manifest.json')
 const DRY_RUN = process.argv.includes('--dry-run')
 const LIMIT = Number(process.argv.find(arg => arg.startsWith('--limit='))?.split('=')[1] || 0)
+const PACK_FILTERS = (process.argv.find(arg => arg.startsWith('--pack='))?.split('=')[1] || '')
+  .split(',')
+  .map(pack => pack.trim())
+  .filter(Boolean)
 
 function logoDevUrl(domain) {
   return `https://img.logo.dev/${domain}?token=${CONFIG.token}&size=160&format=png`
@@ -42,8 +48,10 @@ function buildRegistry() {
 
   LOGO_POOL.forEach(item => add(item, 'brands'))
   TRAVEL_POOL.forEach(item => add(item, 'travel'))
+  TECH_CAR_POOL.forEach(item => add(item, 'tech-car'))
+  FASHION_FINANCE_POOL.forEach(item => add(item, 'fashion-finance'))
 
-  const rows = [...registry.values()].map(item => ({
+  let rows = [...registry.values()].map(item => ({
     domain: item.domain,
     name: item.name,
     packs: [...item.packs].sort(),
@@ -52,6 +60,10 @@ function buildRegistry() {
     publicUrl: publicUrl(`${VERSION}/${item.domain}.png`),
     sourceUrl: logoDevUrl(item.domain),
   }))
+
+  if (PACK_FILTERS.length) {
+    rows = rows.filter(item => PACK_FILTERS.some(pack => item.packs.includes(pack)))
+  }
 
   return LIMIT ? rows.slice(0, LIMIT) : rows
 }

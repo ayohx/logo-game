@@ -18,10 +18,32 @@ test('travel pack contains 100 verified Travel and Adventure logos', () => {
   assert.equal(new Set(domains).size, domains.length, 'travel domains must be unique')
 })
 
+test('Tech and Car pack contains 100 unique candidate logos', () => {
+  const src = read('src/data/tech-car.js')
+  const domains = [...src.matchAll(/domain: '([^']+)'/g)].map(match => match[1])
+
+  assert.equal(domains.length, 100)
+  assert.ok(domains.includes('tesla.com'), 'Tesla should be included')
+  assert.ok(domains.includes('openai.com'), 'OpenAI should be included')
+  assert.equal(new Set(domains).size, domains.length, 'tech and car domains must be unique')
+})
+
+test('Fashion and Finance pack contains 100 unique candidate logos', () => {
+  const src = read('src/data/fashion-finance.js')
+  const domains = [...src.matchAll(/domain: '([^']+)'/g)].map(match => match[1])
+
+  assert.equal(domains.length, 100)
+  assert.ok(domains.includes('nike.com'), 'Nike should be included')
+  assert.ok(domains.includes('visa.com'), 'Visa should be included')
+  assert.equal(new Set(domains).size, domains.length, 'fashion and finance domains must be unique')
+})
+
 test('question generation supports selected pack pools', () => {
   const src = read('src/game/questions.js')
 
   assert.ok(src.includes('TRAVEL_POOL'), 'travel pool import missing')
+  assert.ok(src.includes('TECH_CAR_POOL'), 'tech and car pool import missing')
+  assert.ok(src.includes('FASHION_FINANCE_POOL'), 'fashion and finance pool import missing')
   assert.ok(src.includes('ALL_LOGO_POOL'), 'Mix Brands should use the full verified logo set')
   assert.ok(src.includes('PACK_POOLS'), 'pack pool registry missing')
   assert.ok(src.includes('generateQuestions'), 'pack-aware question generator missing')
@@ -34,14 +56,25 @@ test('Mix Brands combines General and Travel logo pools', () => {
   assert.ok(src.includes('dedupeByDomain'), 'combined pool should dedupe domains safely')
 })
 
-test('start screen exposes Travel and Adventure pack selection', () => {
+test('new category packs are registered for question generation', () => {
+  const src = read('src/game/questions.js')
+
+  assert.ok(src.includes("'tech-car': TECH_CAR_POOL"), 'Tech and Car pack registry missing')
+  assert.ok(src.includes("'fashion-finance': FASHION_FINANCE_POOL"), 'Fashion and Finance pack registry missing')
+})
+
+test('start screen exposes all category pack selections', () => {
   const html = read('index.html')
   const main = read('src/main.js')
 
   assert.ok(html.includes('btn-travel'), 'travel pack button missing')
   assert.ok(html.includes('Travel &amp; Adventure'), 'travel pack label missing')
+  assert.ok(html.includes('btn-tech-car'), 'Tech and Car pack button missing')
+  assert.ok(html.includes('Tech &amp; Car'), 'Tech and Car pack label missing')
+  assert.ok(html.includes('btn-fashion-finance'), 'Fashion and Finance pack button missing')
+  assert.ok(html.includes('Fashion &amp; Finance'), 'Fashion and Finance pack label missing')
   assert.ok(main.includes('selectedPack'), 'selected pack state missing')
-  assert.ok(main.includes("selectPack('travel')"), 'travel pack handler missing')
+  assert.ok(main.includes('PACK_BUTTONS'), 'shared pack handlers missing')
 })
 
 test('shuffle animation avoids extra random logo.dev image cycling', () => {
