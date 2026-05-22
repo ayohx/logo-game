@@ -80,11 +80,14 @@ test('start screen exposes all category pack selections', () => {
 test('start game is disabled until a category is selected', () => {
   const html = read('index.html')
   const main = read('src/main.js')
+  const css = read('style.css')
 
   assert.match(html, /id="btn-start-game"[^>]*disabled/, 'Start Game should be disabled before category selection')
   assert.ok(!html.includes('pack-card is-selected'), 'no pack should be pre-selected now that categories are required')
   assert.ok(main.includes("let selectedPack = ''"), 'selected pack should start empty')
   assert.ok(main.includes('syncStartButtonState'), 'main should enable Start Game after pack selection')
+  assert.ok(css.includes('.btn-primary:disabled'), 'disabled primary button should have a greyed-out visual state')
+  assert.ok(css.includes('cursor: not-allowed'), 'disabled Start Game should clearly look unavailable')
 })
 
 test('gameplay HUD shows the selected category as a compact reminder', () => {
