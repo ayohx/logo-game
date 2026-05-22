@@ -12,6 +12,7 @@ const SUPABASE_URL = process.env.SUPABASE_URL || 'https://xbcwbzsgvmerkbnnplep.s
 const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || ''
 const BUCKET = process.env.LOGO_STORAGE_BUCKET || 'logo-game-logos'
 const VERSION = process.env.LOGO_ASSET_VERSION || 'v1'
+const REGISTRY_FUNCTION = `${SUPABASE_URL}/functions/v1/logo-game-logo-assets`
 const MANIFEST_PATH = path.join(PROJECT_ROOT, 'logo-assets-manifest.json')
 const DRY_RUN = process.argv.includes('--dry-run')
 const LIMIT = Number(process.argv.find(arg => arg.startsWith('--limit='))?.split('=')[1] || 0)
@@ -111,14 +112,11 @@ async function upsertRegistry(asset) {
     updated_at: new Date().toISOString(),
   }
 
-  const response = await fetch(`${SUPABASE_URL}/rest/v1/logo_assets?on_conflict=domain`, {
+  const response = await fetch(REGISTRY_FUNCTION, {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${SERVICE_KEY}`,
-      apikey: SERVICE_KEY,
       'Content-Type': 'application/json',
-      Prefer: 'resolution=merge-duplicates',
-      'Content-Profile': 'logo_game',
     },
     body: JSON.stringify(payload),
   })

@@ -44,9 +44,10 @@ test('logo asset sync script documents required environment and uploads verified
   const src = read('scripts/sync-logo-assets.mjs')
 
   assert.ok(src.includes('SUPABASE_SERVICE_ROLE_KEY'), 'service role env requirement missing')
+  assert.ok(src.includes('logo-game-logo-assets'), 'private registry Edge Function call missing')
   assert.ok(src.includes('logo-game-logos'), 'storage bucket name missing')
   assert.ok(src.includes('src/data/brands.js'), 'General logo pool import missing')
   assert.ok(src.includes('src/data/travel.js'), 'Travel logo pool import missing')
-  assert.ok(src.includes('logo_assets'), 'logo asset registry upsert missing')
+  assert.ok(src.includes('REGISTRY_FUNCTION'), 'logo asset registry upsert endpoint missing')
   assert.ok(src.includes('--dry-run'), 'dry run mode missing')
 })
