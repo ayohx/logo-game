@@ -35,6 +35,7 @@ test('admin page has tabbed analytics sections and table controls', () => {
     'admin-date-filter',
     'admin-search',
     'admin-page-size',
+    'btn-admin-export',
   ].forEach(id => {
     assert.ok(html.includes(id), `${id} missing from admin page`)
   })
@@ -59,9 +60,21 @@ test('admin client supports paged, sorted, filtered tab data', () => {
   assert.ok(src.includes('dateRange'), 'admin request should send the selected date range')
   assert.ok(src.includes('admin-search'), 'search wiring missing')
   assert.ok(src.includes('renderPagination'), 'pagination rendering missing')
+  assert.ok(src.includes('exportCurrentTabCsv'), 'CSV export handler missing')
   assert.ok(src.includes('categoryPerformance'), 'category performance tab missing')
   assert.ok(src.includes('questionInsights'), 'question insights tab missing')
   assert.ok(src.includes('logoHealth'), 'logo health tab missing')
+})
+
+test('admin CSV export uses current tab filters and exports all rows', () => {
+  const src = read('src/admin.js')
+
+  assert.ok(src.includes('fetchAllRowsForExport'), 'CSV export should fetch all matching rows')
+  assert.ok(src.includes('limit: 100'), 'CSV export should page through the maximum API page size')
+  assert.ok(src.includes('offset += rows.length'), 'CSV export should continue beyond the visible page')
+  assert.ok(src.includes('toCsv'), 'CSV conversion helper missing')
+  assert.ok(src.includes('downloadCsv'), 'CSV download helper missing')
+  assert.ok(src.includes('csvFileName'), 'CSV filename helper missing')
 })
 
 test('admin date filter exposes useful preset ranges', () => {

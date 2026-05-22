@@ -323,7 +323,11 @@ Goal: decide whether `/admin.html` is only "functional" or should become a sharp
   - Add Today, Last 7 days, Last 30 days, and All time controls.
   - Apply the range to overview, recent plays, category performance, player stats, leaderboard where relevant, question insights, and logo-health verification dates.
   - Keep date filtering visibly separate from pack and search filters.
-- [ ] Add CSV export for admin tables.
+- [x] Add CSV export for admin tables.
+  - Export the currently selected tab.
+  - Respect current pack, date range, search, and sort controls.
+  - Export all matching rows, not just the visible page.
+  - Use clear filenames such as `logo-game-category-performance-last-7-days.csv`.
 
 ### Technical Improvements
 

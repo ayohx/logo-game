@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="robots" content="noindex,nofollow" />
   <title>Logo Quiz Admin</title>
-  <link rel="stylesheet" href="style.css?v=20260522-admin-search-width" />
+  <link rel="stylesheet" href="style.css?v=20260522-admin-csv-export" />
 </head>
 <body class="admin-body">
   <main class="admin-shell">
@@ -84,12 +84,15 @@
             <h2 id="admin-panel-title">Overview</h2>
             <p class="admin-muted" id="admin-panel-summary"></p>
           </div>
-          <div class="admin-pagination" id="admin-pagination"></div>
+          <div class="admin-panel-actions">
+            <button class="btn btn-ghost btn-sm" id="btn-admin-export" type="button">Export CSV</button>
+            <div class="admin-pagination" id="admin-pagination"></div>
+          </div>
         </div>
         <div id="admin-table" class="admin-table-wrap"></div>
       </section>
     </section>
   </main>
-  <script type="module" src="src/admin.js?v=20260522-admin-date-filter"></script>
+  <script type="module" src="src/admin.js?v=20260522-admin-csv-export"></script>
 </body>
 </html>

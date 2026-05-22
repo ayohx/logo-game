@@ -3,6 +3,7 @@ const FUNCTION_BASE = 'https://xbcwbzsgvmerkbnnplep.supabase.co/functions/v1'
 const passwordInput = document.getElementById('admin-password')
 const loginButton = document.getElementById('btn-admin-login')
 const refreshButton = document.getElementById('btn-admin-refresh')
+const exportButton = document.getElementById('btn-admin-export')
 const errorEl = document.getElementById('admin-error')
 let adminPassword = ''
 let activeTab = 'overview'
@@ -259,6 +260,77 @@ function renderOverviewRows(totals = {}) {
   ]
 }
 
+function csvEscape(value) {
+  const text = String(value ?? '')
+  return /[",\n\r]/.test(text) ? `"${text.replaceAll('"', '""')}"` : text
+}
+
+function toCsv(rows, columns) {
+  const header = columns.map(([, label]) => csvEscape(label)).join(',')
+  const body = rows.map(row => columns.map(([key]) => csvEscape(formatCell(key, row))).join(',')).join('\n')
+  return body ? `${header}\n${body}\n` : `${header}\n`
+}
+
+function slugify(value) {
+  return String(value || '')
+    .toLowerCase()
+    .replace(/&/g, 'and')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+}
+
+function csvFileName() {
+  const tab = slugify(tabConfig[activeTab].title)
+  const dateRange = slugify(formatDateRange(document.getElementById('admin-date-filter')?.value || 'all'))
+  const pack = slugify(formatPack(document.getElementById('admin-pack-filter')?.value || 'all'))
+  return `logo-game-${tab}-${pack}-${dateRange}.csv`
+}
+
+function downloadCsv(filename, csv) {
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' })
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement('a')
+  link.href = url
+  link.download = filename
+  document.body.appendChild(link)
+  link.click()
+  link.remove()
+  URL.revokeObjectURL(url)
+}
+
+async function fetchAllRowsForExport() {
+  if (activeTab === 'overview') return renderOverviewRows(latestData?.totals || {})
+
+  const allRows = []
+  let offset = 0
+  while (true) {
+    const data = await fetchAdminAnalytics(adminPassword, { limit: 100, offset, sortBy, sortDir })
+    const rows = data.rows || data[activeTab] || []
+    allRows.push(...rows)
+    if (!rows.length || allRows.length >= (data.totalRows ?? allRows.length)) break
+    offset += rows.length
+  }
+  return allRows
+}
+
+async function exportCurrentTabCsv() {
+  if (!adminPassword) return
+  const originalText = exportButton.textContent
+  exportButton.disabled = true
+  exportButton.textContent = 'Exporting...'
+  errorEl.textContent = ''
+  try {
+    const rows = await fetchAllRowsForExport()
+    const csv = toCsv(rows, tabConfig[activeTab].columns)
+    downloadCsv(csvFileName(), csv)
+  } catch (error) {
+    errorEl.textContent = error instanceof Error ? error.message : 'Could not export CSV.'
+  } finally {
+    exportButton.disabled = false
+    exportButton.textContent = originalText
+  }
+}
+
 function renderPagination(total = 0) {
   const target = document.getElementById('admin-pagination')
   const pages = Math.max(1, Math.ceil(total / pageSize))
@@ -312,6 +384,7 @@ refreshButton.addEventListener('click', async () => {
   if (!adminPassword) return
   renderDashboard(await fetchAdminAnalytics(adminPassword))
 })
+exportButton.addEventListener('click', exportCurrentTabCsv)
 
 document.querySelectorAll('.admin-tab').forEach(button => {
   button.addEventListener('click', () => {

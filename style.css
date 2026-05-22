@@ -1504,6 +1504,14 @@ details[open] .hs-arrow { transform: rotate(90deg); }
   align-items: flex-start;
 }
 
+.admin-panel-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
 .admin-pagination {
   display: flex;
   align-items: center;
@@ -1582,4 +1590,5 @@ details[open] .hs-arrow { transform: rotate(90deg); }
   .admin-login-row,
   .admin-header,
   .admin-panel-header { flex-direction: column; }
+  .admin-panel-actions { justify-content: flex-start; }
 }
